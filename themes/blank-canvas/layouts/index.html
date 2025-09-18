@@ -35,7 +35,6 @@
     <p class="mt-4 text-sm text-center text-gray-600">— Charlie Scheer, iOS Developer @Automattic</p>
   </div>
 
-  <!-- Problem Section -->
   <section class="mb-12">
     <h3 class="text-2xl font-semibold text-center mb-4">
       “I hate tapping through the app to verify my changes”
@@ -46,5 +45,68 @@
     <p class="max-w-2xl mx-auto text-gray-700">
       With unit tests, you can verify your business logic behavior without manually stepping through the different screens of the app. Each test runs at a fraction of the time it takes to exercise the app through its UI.
     </p>
+  </section>
+
+  <!-- TODO: Newsletter signup -->
+
+  <section class="mb-12">
+    <h3 class="text-2xl font-semibold text-center mb-4">
+      “I’ve done the unit tests tutorials online, but I don’t know how to test real code”
+    </h3>
+    <p class="max-w-2xl mx-auto text-gray-700 mb-4">
+      Most unit testing tutorials use examples too simple compared to the real-world code we write every day. Who needs to implement a summation function?! That’s why the book teaches <strong>how to write tests and practice TDD to build a real-world application</strong>.
+    </p>
+    <p class="max-w-2xl mx-auto text-gray-700">
+      You’ll meet Alberto, an Italian restaurant owner in need of a custom-built menu ordering app. His simple yet realistic app requires networking, third-party SDKs, sharing state across multiple screens, and, of course, managing list views.
+    </p>
+  </section>
+
+  <section class="mb-12">
+    <h3 class="text-2xl font-semibold text-center mb-4">
+      <em>Table of Contents</em>
+    </h3>
+    <ol>
+      <li>Why Test-Driven Development?</li>
+      <li>XCTest Introduction</li>
+      <li>Getting started with TDD</li>
+      <li>TDD in the real world</li>
+      <li>Changing Tests with Fixtures</li>
+      <li>Testing Static SwiftUI Views</li>
+      <li>Testing Dynamic SwiftUI Views</li>
+      <li>Testing Code Based on Indirect Inputs</li>
+      <li>Testing JSON Decoding</li>
+      <li>Testing Networking Code</li>
+      <li>Injecting Dependencies with <code>@EnvironmentObject</code></li>
+      <li>Testing Side Effects</li>
+      <li>Testing Views Conditional Presentation</li>
+      <li>Fixing Bugs and Changing Existing Code with TDD</li>
+      <li>Keeping Tests Isolated and Clear with Fakes and Dummies</li>
+      <li>Conclusion: More Than Just Testing</li>
+      <li>Appendix: Quick &amp; Nimble</li>
+      <li>Appendix: Where to go from here</li>
+      <li>Appendix: Testing UIKit code</li>
+    </ol>
+  </section>
+
+  <!-- About the Author -->
+  <section class="mb-12">
+    <h3 class="text-2xl font-semibold text-gray-800 italic mb-6">About the Author</h3>
+    <div class="flex flex-col md:flex-row items-center gap-6">
+      <div class="flex-shrink-0 w-48">
+        <img src="https://i0.wp.com/tddinswift.com/wp-content/uploads/2025/03/88d4a-gio.png?resize=620%2C620&amp;ssl=1"
+             alt="A picture of Gio."
+             class="rounded-full w-48 h-48 object-cover shadow-md" />
+      </div>
+      <div>
+        <p class="text-gray-700">
+          Ciao!
+          I’m Gio.
+          For more than a decade, I’ve explored software testing, automation, and Test-Driven Development.
+          Since 2015, I’ve been sharing ideas on testing on my <a href="https://mokacoding.com" class="text-blue-600 hover:underline">blog</a> and <a href="https://gio.codes/talks/" class="text-blue-600 hover:underline">talks</a>.
+          I collected everything I learned in <em>Test-Driven Development in Swift</em>.
+          I hope you’ll enjoy it.
+        </p>
+      </div>
+    </div>
   </section>
 {{ end }}
