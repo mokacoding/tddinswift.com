@@ -306,10 +306,13 @@ class MenuFetchingPlaceholder: MenuFetching {
 }
 ```
 
+<!-- TODO(TODO.md): restore `albertos-retry-demo.gif` — asset wasn't captured on wayback.
 <figure class="aligncenter is-resized">
 <img src="https://web.archive.org/web/20230201195124im_/https://i0.wp.com/tddinswift.com/wp-content/uploads/2021/07/albertos-retry-demo.gif?resize=209%2C456&amp;ssl=1" class="jetpack-lazy-image" width="209" height="456" alt="Animated GIF showing the retry flow in action" />
 <img src="https://web.archive.org/web/20230201195124im_/https://i0.wp.com/tddinswift.com/wp-content/uploads/2021/07/albertos-retry-demo.gif?resize=209%2C456&amp;ssl=1" width="209" height="456" alt="Animated GIF showing the retry flow in action" />
 </figure>
+-->
+
 
 ## Alternative Test Implementation
 

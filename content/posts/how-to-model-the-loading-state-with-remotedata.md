@@ -208,10 +208,13 @@ menuFetching
     .sink(/* ... */)
 ```
 
+<!-- TODO(TODO.md): restore `albertos-loading-demo.gif` — asset wasn't captured on wayback.
 <figure class="aligncenter is-resized">
 <img src="https://web.archive.org/web/20230201181615im_/https://i0.wp.com/tddinswift.com/wp-content/uploads/2021/07/albertos-loading-demo.gif?resize=193%2C422&amp;ssl=1" class="jetpack-lazy-image" width="193" height="422" alt="GIF showing the app launching, the view, and finally the loaded menu" />
 <img src="https://web.archive.org/web/20230201181615im_/https://i0.wp.com/tddinswift.com/wp-content/uploads/2021/07/albertos-loading-demo.gif?resize=193%2C422&amp;ssl=1" width="193" height="422" alt="GIF showing the app launching, the view, and finally the loaded menu" />
 </figure>
+-->
+
 
 Fun fact. When working on this code, I added the delay call, verified it worked, and then took a break. Once back on it, I run the unit tests, *as one does when picking up a codebase after a break*, and they failed. I spent a good 5 minutes scratching my head trying to figure out why and eventually realized the timeout in the tests was 1 second, and I had the delay set to 2 seconds.
 
