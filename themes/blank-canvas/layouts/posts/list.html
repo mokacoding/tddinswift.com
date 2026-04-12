@@ -1,6 +1,5 @@
 {{ define "main" }}
   <main class="max-w-3xl mx-auto px-4 py-12">
-    <h1 class="text-4xl font-heading mb-2">{{ .Title }}</h1>
     <div class="prose prose-slate max-w-none mb-8">{{ .Content }}</div>
     <ul class="space-y-6">
       {{ range .Pages.ByDate.Reverse }}
