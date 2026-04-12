@@ -60,3 +60,7 @@ Don't assume which major version is in effect without checking what Hugo's pipel
 
 - Front matter is **YAML** (`---` fenced), per the recent migration commit.
 - Prefer editing the theme under `themes/blank-canvas/` for layout/style changes; only add files at the repo root `layouts/` if intentionally overriding the theme.
+
+## Follow-ups
+
+Check [`TODO.md`](TODO.md) at the start of a session for outstanding follow-ups, and append new tasks there rather than burying them in chat.
