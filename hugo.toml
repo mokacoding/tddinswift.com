@@ -2,3 +2,6 @@ baseURL = 'https://tddinswift.com/'
 languageCode = 'en-us'
 title = 'TDD in Swift'
 theme = 'blank-canvas'
+
+[permalinks]
+  posts = '/:slug/'

@@ -1,0 +1,18 @@
+{{ define "main" }}
+  <main class="max-w-3xl mx-auto px-4 py-12">
+    <article class="prose prose-slate max-w-none">
+      <header class="mb-8 not-prose">
+        <h1 class="text-4xl font-heading mb-2">{{ .Title }}</h1>
+        {{ with .Date }}
+          {{ $machine := . | time.Format "2006-01-02" }}
+          {{ $human := . | time.Format "January 2, 2006" }}
+          <time datetime="{{ $machine }}" class="text-sm text-gray-500">{{ $human }}</time>
+        {{ end }}
+      </header>
+      {{ .Content }}
+    </article>
+    <p class="mt-12">
+      <a href="/" class="text-blue-600 hover:underline">&larr; Back to home</a>
+    </p>
+  </main>
+{{ end }}
