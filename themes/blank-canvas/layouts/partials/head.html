@@ -4,6 +4,11 @@
 {{/* partialCached "head/css.html" . */}}
 {{ partialCached "head/js.html" . }}
 
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap">
+
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 <script>
@@ -11,11 +16,27 @@
     theme: {
       extend: {
         colors: {
-          primary: '#tomato',
-        }
+          background: '#1f2527',
+          foreground: {
+            DEFAULT: '#ffffff',
+            muted: '#e6e6e6',
+          },
+          primary: {
+            DEFAULT: '#9fd3e8',
+            hover: '#ffffff',
+          },
+          secondary: {
+            DEFAULT: '#fbe6aa',
+            hover: '#ffffff',
+          },
+          tertiary: '#364043',
+        },
+        fontFamily: {
+          display: ['"Playfair Display"', 'Georgia', 'serif'],
+          body: ['"Fira Sans"', 'system-ui', 'sans-serif'],
+        },
       },
-      plugins: [tailwind.typography], // unsure whether this is working...
-    }
+    },
   }
 </script>
 
