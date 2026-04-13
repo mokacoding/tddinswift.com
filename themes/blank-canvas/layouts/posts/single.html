@@ -1,18 +1,29 @@
 {{ define "main" }}
-  <main class="max-w-3xl mx-auto px-4 py-12">
-    <article class="prose prose-slate max-w-none">
-      <header class="mb-8 not-prose">
-        <h1 class="text-4xl font-heading mb-2">{{ .Title }}</h1>
+  <main class="max-w-3xl mx-auto px-4 py-16">
+    <article class="prose prose-invert max-w-none
+                    prose-headings:font-display prose-headings:text-primary
+                    prose-h1:font-display prose-h1:text-4xl prose-h1:md:text-5xl prose-h1:text-primary
+                    prose-p:text-foreground-muted
+                    prose-strong:text-foreground
+                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-a:underline-offset-4
+                    prose-code:text-primary prose-code:bg-tertiary/60 prose-code:px-1 prose-code:rounded prose-code:font-normal
+                    prose-code:before:content-none prose-code:after:content-none
+                    prose-pre:bg-tertiary/60 prose-pre:border prose-pre:border-tertiary
+                    prose-blockquote:border-primary prose-blockquote:text-foreground-muted
+                    prose-hr:border-tertiary
+                    prose-li:text-foreground-muted marker:text-primary">
+      <header class="mb-10 not-prose">
+        <h1 class="font-display text-4xl md:text-5xl text-primary mb-3">{{ .Title }}</h1>
         {{ with .Date }}
           {{ $machine := . | time.Format "2006-01-02" }}
           {{ $human := . | time.Format "January 2, 2006" }}
-          <time datetime="{{ $machine }}" class="text-sm text-gray-500">{{ $human }}</time>
+          <time datetime="{{ $machine }}" class="text-sm text-foreground-muted">{{ $human }}</time>
         {{ end }}
       </header>
       {{ .Content }}
     </article>
-    <p class="mt-12">
-      <a href="/" class="text-blue-600 hover:underline">&larr; Back to home</a>
+    <p class="mt-16">
+      <a href="/" class="text-primary hover:text-primary-hover underline underline-offset-4">&larr; Back to home</a>
     </p>
   </main>
 {{ end }}
