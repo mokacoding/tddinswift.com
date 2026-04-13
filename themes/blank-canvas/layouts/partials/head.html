@@ -40,6 +40,16 @@
   }
 </script>
 
+<style media="print">
+  /* Revert dark theme for print so ink is black on white paper. */
+  body { background: #ffffff !important; color: #000000 !important; }
+  .prose-invert, .prose-invert * { color: #000000 !important; }
+  .prose-invert a { color: #000000 !important; text-decoration: underline; }
+  .prose-invert code,
+  .prose-invert pre { background: #f4f4f4 !important; color: #000000 !important; }
+  .prose-invert blockquote { border-color: #000000 !important; }
+</style>
+
 <meta name="description" content="Harness the power of unit testing to write clean code that works; fast and with confidence." />
 <meta property="og:title" content="TDD in Swift" />
 <meta property="og:description" content="Harness the power of unit testing to write clean code that works; fast and with confidence." />
