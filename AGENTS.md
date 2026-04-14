@@ -45,17 +45,6 @@ The CDN approach is intentional but has known production downsides
 (FOUC on first paint, runtime JS dependency on a third-party CDN, larger payload, Tailwind v3 only).
 See `TODO.md` for the eventual move to a proper build pipeline.
 
-### Dormant theme scaffold
-
-The following files are leftover boilerplate from `hugo new theme blank-canvas` and are not part of the live styling pipeline:
-
-- `themes/blank-canvas/layouts/partials/head/css.html` — would load `assets/css/main.css` via Hugo's asset pipeline, but the call site in `head.html` is commented out.
-- `themes/blank-canvas/assets/css/main.css` — boilerplate body styles, no `@tailwind` directives, currently unreferenced.
-- `themes/blank-canvas/layouts/partials/head/js.html` — *actively called* from `head.html`; loads `assets/js/main.js`.
-- `themes/blank-canvas/assets/js/main.js` — contains only a `console.log` debug line.
-
-All four are candidates for deletion in a future cleanup — see `TODO.md`.
-
 ### Generated / ignored paths
 
 - `public/` — Hugo build output, gitignored.
