@@ -4,8 +4,6 @@ This repository is the source for [tddinswift.com](https://tddinswift.com).
 
 ## Commands
 
-- `npm install`
-  Install the site dependencies.
 - `hugo server`
   Serve the site locally with live reload.
 - `hugo`

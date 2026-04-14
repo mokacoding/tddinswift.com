@@ -7,11 +7,10 @@ Single Hugo site, no multi-language setup, deployed as a static site from `publi
 
 ## Commands
 
-Hugo extended is required (the Tailwind pipeline below depends on it).
-Refer to [README.md](/Users/gio/Developer/mokacoding-pty-ltd/tddinswift.com/README.md) for the list of commands used to install dependencies, serve the site, build it, and prepare it for deployment.
+Refer to [README.md](README.md) for the commands to serve the site locally and build it for deployment.
 
-There is no test suite.
-The `npm test` script is the npm-init placeholder and intentionally fails.
+There is no test suite, and no local build step beyond Hugo itself —
+no npm tooling, no Tailwind build, no PostCSS.
 
 ## Architecture
 
@@ -27,33 +26,41 @@ Key template entry points:
 - `themes/blank-canvas/layouts/index.html` — landing page (rendered for `content/_index.md`, which sets `type: landing`).
 - `themes/blank-canvas/layouts/_default/{single,list,home}.html` — defaults for other page kinds.
 - `themes/blank-canvas/layouts/partials/` — `head.html`, `header.html`, `footer.html`, `menu.html`, `terms.html`.
-- `themes/blank-canvas/layouts/_partials/css.html` — Tailwind pipeline (see below).
 
 Content lives at the repo root under `content/` (`_index.md` for the landing page, `errata.md`, etc.).
 Front matter is YAML.
 
-### Tailwind via Hugo's built-in pipeline
+### Styling: Tailwind via the play CDN
 
-CSS is processed by Hugo's `css.TailwindCSS` function, **not** by running `tailwindcss` or `postcss` from npm scripts.
-The flow:
+Tailwind CSS is loaded at runtime via the play CDN
+(`https://cdn.tailwindcss.com?plugins=typography`),
+included as a `<script>` tag in `themes/blank-canvas/layouts/partials/head.html`.
+The theme palette (colors, fonts) is configured in an inline `tailwind.config = {...}` in the same partial.
+A small `<style media="print">` block lives there too, to revert the dark theme to ink-on-paper.
 
-1. `themes/blank-canvas/layouts/_partials/css.html` calls `resources.Get "css/main.css" | css.TailwindCSS`.
-2. Hugo invokes the Tailwind CLI under the hood, minifies in production, and fingerprints the asset.
-3. The source stylesheet is `themes/blank-canvas/assets/css/main.css`.
+There is no local Tailwind build step.
+No `tailwind.config.js`, no `postcss.config.js`, no `package.json`, no npm dependencies.
 
-The root-level `tailwind.config.js` and `postcss.config.js` exist but the active pipeline is Hugo-driven.
-Tailwind config currently points `content` at `./layouts/**/*.html` and `./content/**/*.{md,html}` —
-note that the actual templates live under `themes/blank-canvas/layouts/`, so this config does not see them.
-The recent "errata" commit flagged this as a known rough edge to clean up; keep it in mind when touching styles or class names.
+The CDN approach is intentional but has known production downsides
+(FOUC on first paint, runtime JS dependency on a third-party CDN, larger payload, Tailwind v3 only).
+See `TODO.md` for the eventual move to a proper build pipeline.
 
-`package.json` pulls in both `tailwindcss@^3` and `@tailwindcss/cli@^4`, plus `@tailwindcss/typography`.
-Don't assume which major version is in effect without checking what Hugo's pipeline actually resolves.
+### Dormant theme scaffold
+
+The following files are leftover boilerplate from `hugo new theme blank-canvas` and are not part of the live styling pipeline:
+
+- `themes/blank-canvas/layouts/partials/head/css.html` — would load `assets/css/main.css` via Hugo's asset pipeline, but the call site in `head.html` is commented out.
+- `themes/blank-canvas/assets/css/main.css` — boilerplate body styles, no `@tailwind` directives, currently unreferenced.
+- `themes/blank-canvas/layouts/partials/head/js.html` — *actively called* from `head.html`; loads `assets/js/main.js`.
+- `themes/blank-canvas/assets/js/main.js` — contains only a `console.log` debug line.
+
+All four are candidates for deletion in a future cleanup — see `TODO.md`.
 
 ### Generated / ignored paths
 
 - `public/` — Hugo build output, gitignored.
-- `resources/` — Hugo asset cache, currently untracked.
-- `hugo_stats.json` — written by Hugo when stats are enabled, currently untracked.
+- `resources/` — Hugo asset cache, gitignored.
+- `hugo_stats.json` — written by Hugo when stats are enabled, gitignored.
 - `.hugo_build.lock` — Hugo's build lock.
 
 ## Conventions
