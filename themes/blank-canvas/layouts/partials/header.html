@@ -1,1 +1,5 @@
-{{/* Intentionally empty for the moment — the landing page doesn't need a header. */}}
+{{ if not .IsHome }}
+<nav class="max-w-3xl mx-auto px-4 py-4">
+  <a href="/" class="font-display text-lg text-secondary hover:text-secondary-hover">TDD in Swift</a>
+</nav>
+{{ end }}
