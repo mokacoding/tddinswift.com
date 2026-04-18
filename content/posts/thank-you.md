@@ -16,6 +16,6 @@ In the meantime, it would mean the world to me if you could leave a review on Am
 
 I’d love to hear more about your experience with TDD! You can get in touch with me:
 
-- on Twitter @mokagio
+- on X [@mokagio](https://x.com/mokagio)
 - by replying to the bonus email you’ll receive
-- or via gio.codes
+- or at [giolodi.com](https://giolodi.com)
