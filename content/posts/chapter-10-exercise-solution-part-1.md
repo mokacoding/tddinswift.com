@@ -46,7 +46,7 @@ class NetworkFetchingStub: NetworkFetching {
         self.result = result
     }
 
-    // ...
+    // ... implementation below ...
 }
 ```
 
@@ -57,18 +57,15 @@ We can then move on to adding the logic to check the request sent to the `load(_
 ```swift
 // NetworkFetchingStub.swift
 // ...
-func load(_ request: URLRequest) -> AnyPublisher<Data, URLError> {
-    let result: Result<Data, URLError>
+func load(_ request: URLRequest) async throws -> Data {
     switch self.request {
-    case .none: result = self.result
-    case .some(let storedRequest) where storedRequest == request: result = self.result
-    case _: result = .failure(URLError(.unknown))
+    case .none:
+        return try result.get()
+    case .some(let storedRequest) where storedRequest == request:
+        return try result.get()
+    default:
+        throw URLError(.unknown)
     }
-
-    return result.publisher
-        // Use a delay to simulate the real world async behavior
-        .delay(for: 0.01, scheduler: RunLoop.main)
-        .eraseToAnyPublisher()
 }
 ```
 
@@ -81,35 +78,24 @@ Armed with our refined Stub, we can write a test to verify the URL in the reques
 ```swift
 // MenuFetcherTests.swift
 // ...
-func testUsesGivenBaseURLInRequest() throws {
-    let url = try XCTUnwrap(URL(string: "https://s3.amazonaws.com/mokacoding/menu_response.json"))
+@Test func usesGivenBaseURLInRequest() async throws {
+    let url = try #require(URL(string: "https://s3.amazonaws.com/mokacoding/menu_response.json"))
     let json = """
-[
-    { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }
-]
-"""
-    let data = try XCTUnwrap(json.data(using: .utf8))
+    [
+        { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }
+    ]
+    """
+    let data = try #require(json.data(using: .utf8))
     let networkFetchingStub = NetworkFetchingStub(
         returning: .success(data),
         for: URLRequest(url: url)
     )
     let menuFetcher = MenuFetcher(networkFetching: networkFetchingStub)
 
-    let expectation = XCTestExpectation(description: "Receives data")
-
-    menuFetcher.fetchMenu()
-        .sink(
-            receiveCompletion: { _ in },
-            receiveValue: { _ in
-                // We don't care about the values received. We're only interested to know that
-                // we're here instead than in the failure branch, which means the request
-                // received by the Stub matched our expectation.
-                expectation.fulfill()
-            }
-        )
-        .store(in: &cancellables)
-
-    wait(for: [expectation], timeout: 1)
+    // We don't care about the values received. We're only interested to know
+    // the call completes without throwing, which means the request received by
+    // the Stub matched our expectation.
+    _ = try await menuFetcher.fetchMenu()
 }
 ```
 
@@ -126,13 +112,12 @@ We can start by defining the `baseURL` locally within `fetchMenu()`:
 ```swift
 // MenuFetcher.swift
 // ...
-func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
+func fetchMenu() async throws -> [MenuItem] {
     let baseURL = URL(string: "https://raw.githubusercontent.com/mokagio/tddinswift_fake_api/trunk")!
     let request = URLRequest(url: baseURL.appendingPathComponent("menu_response.json"))
 
-    return networkFetching.load(request)
-        .decode(type: [MenuItem].self, decoder: JSONDecoder())
-        .eraseToAnyPublisher()
+    let data = try await networkFetching.load(request)
+    return try JSONDecoder().decode([MenuItem].self, from: data)
 }
 ```
 
@@ -148,12 +133,11 @@ class MenuFetcher: MenuFetching {
 
     // ...
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
+    func fetchMenu() async throws -> [MenuItem] {
         let request = URLRequest(url: baseURL.appendingPathComponent("menu_response.json"))
 
-        return networkFetching.load(request)
-            .decode(type: [MenuItem].self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+        let data = try await networkFetching.load(request)
+        return try JSONDecoder().decode([MenuItem].self, from: data)
     }
 }
 ```
@@ -187,15 +171,15 @@ We can make the test explicit by using a different URL value:
 ```swift
 // MenuFetcherTests.swift
 // ...
-func testUsesGivenBaseURLInRequest() throws {
-    let baseURL = try XCTUnwrap(URL(string: "https://test.url"))
+@Test func usesGivenBaseURLInRequest() async throws {
+    let baseURL = try #require(URL(string: "https://test.url"))
     let url = baseURL.appendingPathComponent("menu_response.json")
     let json = """
-[
-    { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }
-]
-"""
-    let data = try XCTUnwrap(json.data(using: .utf8))
+    [
+        { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }
+    ]
+    """
+    let data = try #require(json.data(using: .utf8))
     let networkFetchingStub = NetworkFetchingStub(
         returning: .success(data),
         for: URLRequest(url: url)
