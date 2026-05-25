@@ -9,7 +9,7 @@ slug: chapter-10-exercise-solution-part-1
 
 It’s rare to find an app that doesn’t rely on a backend service to read or store information these days. Networking is one part of the application development where good design and thorough testing are crucial because of its foundational importance for the app’s functionalities and the inherent fallibility of the network infrastructure outside the reach of the application code.
 
-Chapter 10 showed how to apply the concepts of Dependency Inversion, Dependency Injection, and Test Doubles to the design of the networking part of Alberto’s app. The chapter closes with two fun exercises to make the necessarily constrained example code more versatile: adding API endpoint to fetch data from and updating `MenuFetcher` to be configured with a base URL.
+Chapter 10 showed how to apply the concepts of Dependency Inversion, Dependency Injection, and Test Doubles to the design of the networking part of Alberto’s app. The chapter closes with two fun exercises to make the necessarily constrained example code more versatile: adding an API endpoint to fetch data from and updating `MenuFetcher` to be configured with a base URL.
 
 Let’s start with adding a base URL because it gives me a way to show you how to perform a *Test-Driven Refactor*.
 
@@ -115,11 +115,11 @@ func testUsesGivenBaseURLInRequest() throws {
 
 Run the test, and you’ll see it passes. That’s okay because we’re testing logic that exists already. Still, as I mentioned early in the book, *you should never trust a test no one has seen failing*. If you’re paranoid like me, you might want to tweak the expected URL and verify the test fails before moving forward.
 
-Base URL with Stub – Step 3: Add the base URL parameter to `MenuFetcher`
+## Base URL with Stub – Step 3: Add the base URL parameter to `MenuFetcher`
 
 We now have a test that verifies how `MenuFetcher` builds the `URLRequest` it makes: we can refactor the implementation with confidence.
 
-I like to move in small tests, each backed by a test run, to know I didn’t break the app’s behavior. Before adding a new input parameter to `MenuFetcher`, let’s implement the `URLRequest` `URL` interpolation logic.
+I like to move in small steps, each backed by a test run, to know I didn’t break the app’s behavior. Before adding a new input parameter to `MenuFetcher`, let’s implement the `URLRequest` `URL` interpolation logic.
 
 We can start by defining the `baseURL` locally within `fetchMenu()`:
 
@@ -136,7 +136,7 @@ func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
 }
 ```
 
-Then we can extract the value as a instance constant:
+Then we can extract the value as an instance constant:
 
 ```swift
 // MenuFetcher.swift
@@ -178,7 +178,7 @@ init(
 All these changes were refactoring in the true sense of the word.\
 We updated the code’s implementation without affecting its behavior.
 
-Base URL with Stub – Step 4: Explicitly assert the behavior in the test
+## Base URL with Stub – Step 4: Explicitly assert the behavior in the test
 
 In its current form, the test is implicitly verifying the `URLRequest` creation behavior. The behavior we want to test is that `MenuFetcher` uses the URL given to it during `init`. The test verifies that implicitly because it so happens that the URL it uses is the same as the default value set in the `MenuFetcher` initializer.
 
