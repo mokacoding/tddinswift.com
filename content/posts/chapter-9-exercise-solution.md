@@ -41,31 +41,32 @@ It all starts with a test for the new response:
 ```swift
 // MenuResponseTests.swift
 @testable import Albertos
-import XCTest
+import Testing
+import Foundation
 
-class MenuResponseTests: XCTestCase {
+@Suite struct MenuResponseTests {
 
-    func testWhenDecodedFromJSONDataHasArrayOfValidMenuItems() throws {
+    @Test func whenDecodedFromJSONDataHasArrayOfValidMenuItems() throws {
         // Arrange
         let json = #"""
-{
-    "items": [
         {
-            "name": "spaghetti carbonara",
-            "category": "pasta",
-            "spicy": false,
-            "price": 5.0
-        },
-        {
-            "name": "penne all'arrabbiata",
-            "category": "pasta",
-            "spicy": true,
-            "price": 5.5
+            "items": [
+                {
+                    "name": "spaghetti carbonara",
+                    "category": "pasta",
+                    "spicy": false,
+                    "price": 5.0
+                },
+                {
+                    "name": "penne all'arrabbiata",
+                    "category": "pasta",
+                    "spicy": true,
+                    "price": 5.5
+                }
+            ]
         }
-    ]
-}
-"""#
-        let data = try XCTUnwrap(json.data(using: .utf8))
+        """#
+        let data = try #require(json.data(using: .utf8))
 
         // Act
         // ???
@@ -88,7 +89,9 @@ What kind of assertion or assertions can we write? At this point, `MenuResponse`
 
 ```swift
 // Act + Assert
-XCTAssertNoThrow(try JSONDecoder().decode(MenuResponse.self, from: data))
+#expect(throws: Never.self) {
+    try JSONDecoder().decode(MenuResponse.self, from: data)
+}
 ```
 
 This test passes. I might actually commit the code as it is, with a title like “Add `MenuResponse` `Decodable` type – Empty for the moment”.
@@ -100,7 +103,7 @@ Next, how can we get help from the test to ensure the decoding of the items from
 let response = try JSONDecoder().decode(MenuResponse.self, from: data)
 
 // Assert
-XCTAssertEqual(response.items.count, 2)
+#expect(response.items.count == 2)
     // Compiler says: ❌ Value of type 'MenuResponse' has no member 'items'
 ```
 
@@ -121,19 +124,19 @@ What now? Well, if I were a bit paranoid, I’d want to ensure that the elements
 ```swift
 let response = try JSONDecoder().decode(MenuResponse.self, from: data)
 
-XCTAssertEqual(response.items.count, 2)
+#expect(response.items.count == 2)
 
-let firstItem = try XCTUnwrap(response.items.first)
-XCTAssertEqual(firstItem.name, "spaghetti carbonara")
-XCTAssertEqual(firstItem.category, "pasta")
-XCTAssertEqual(firstItem.spicy, false)
-XCTAssertEqual(firstItem.price, 5.0)
+let firstItem = try #require(response.items.first)
+#expect(firstItem.name == "spaghetti carbonara")
+#expect(firstItem.category == "pasta")
+#expect(firstItem.spicy == false)
+#expect(firstItem.price == 5.0)
 
-let secondItem = try XCTUnwrap(response.items.last)
-XCTAssertEqual(secondItem.name, "penne all'arrabbiata")
-XCTAssertEqual(secondItem.category, "pasta")
-XCTAssertEqual(secondItem.spicy, true)
-XCTAssertEqual(secondItem.price, 5.5)
+let secondItem = try #require(response.items.last)
+#expect(secondItem.name == "penne all'arrabbiata")
+#expect(secondItem.category == "pasta")
+#expect(secondItem.spicy == true)
+#expect(secondItem.price == 5.5)
 ```
 
 This test, too, passes already. Whenever a new test passes out of the gate, we need to take a moment and ask *why*. In this case, it’s because we already implemented the `MenuItem` in Chapter 9.
@@ -145,16 +148,16 @@ I think they are. After all, they are the same as what’s in `MenuItemTests`:
 ```swift
 // MenuItemTests.swift
 // ...
-func testWhenDecodedFromJSONDataHasAllTheInputPropertiesExample1() throws {
+@Test func whenDecodedFromJSONDataHasAllTheInputPropertiesExample1() throws {
     let json = #"{ "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }"#
-    let data = try XCTUnwrap(json.data(using: .utf8))
+    let data = try #require(json.data(using: .utf8))
 
     let item = try JSONDecoder().decode(MenuItem.self, from: data)
 
-    XCTAssertEqual(item.name, "a name")
-    XCTAssertEqual(item.category, "a category")
-    XCTAssertEqual(item.spicy, true)
-    XCTAssertEqual(item.price, 1.0)
+    #expect(item.name == "a name")
+    #expect(item.category == "a category")
+    #expect(item.spicy == true)
+    #expect(item.price == 1.0)
 }
 ```
 
@@ -167,9 +170,9 @@ There’s also an argument for removing the assertions. While it’s true that t
 We could go back to only checking `items` count or have a middle ground solution where we check only one property, just to make sure order is preserved:
 
 ```swift
-XCTAssertEqual(response.items.count, 2)
-XCTAssertEqual(response.items.first?.name, "spaghetti carbonara")
-XCTAssertEqual(response.items.last?.name, "penne all'arrabbiata")
+#expect(response.items.count == 2)
+#expect(response.items.first?.name == "spaghetti carbonara")
+#expect(response.items.last?.name == "penne all'arrabbiata")
 ```
 
 Yet another option is to fold `MenuItemTests` into `MenuResponseTests`.\
