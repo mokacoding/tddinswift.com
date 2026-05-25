@@ -94,22 +94,27 @@ SwiftUI offers the onAppear(perform:) method on `View` to hook up to that precis
 
 ```swift
 // MenuItemDetail.ViewModelTests.swift
-// ...
-func testOnAppearLogsMenuItemDetailVisitedEvent() throws {
-    let eventLoggingSpy = EventLoggingSpy()
-    let item = MenuItem.fixture(name: "item")
-    let viewModel = MenuItemDetail.ViewModel(
-        item: item,
-        orderController: OrderController(order: .fixture()),
-        eventLogging: eventLoggingSpy
-    )
+@testable import Albertos
+import Testing
 
-    viewModel.onAppear()
+@Suite struct MenuItemDetailViewModelTests {
 
-    XCTAssertEqual(eventLoggingSpy.loggedEvents.count, 1)
-    let event = try XCTUnwrap(eventLoggingSpy.loggedEvents.first)
-    XCTAssertEqual(event.name, "menu_item_detail_visited")
-    XCTAssertEqual(event.properties["item_name"] as? String, "item")
+    @Test func onAppearLogsMenuItemDetailVisitedEvent() throws {
+        let eventLoggingSpy = EventLoggingSpy()
+        let item = MenuItem.fixture(name: "item")
+        let viewModel = MenuItemDetail.ViewModel(
+            item: item,
+            orderController: OrderController(order: .fixture()),
+            eventLogging: eventLoggingSpy
+        )
+
+        viewModel.onAppear()
+
+        #expect(eventLoggingSpy.loggedEvents.count == 1)
+        let event = try #require(eventLoggingSpy.loggedEvents.first)
+        #expect(event.name == "menu_item_detail_visited")
+        #expect(event.properties["item_name"] as? String == "item")
+    }
 }
 ```
 
@@ -139,7 +144,7 @@ I think we should start with the implementation in the ViewModel because we alre
 ```swift
 // MenuItemDetail.ViewModelTests.swift
 // ...
-func testOnAddingItemToOrderLogsMenuItemDetailOrderedEvent() throws {
+@Test func onAddingItemToOrderLogsMenuItemDetailOrderedEvent() throws {
     let eventLoggingSpy = EventLoggingSpy()
     let viewModel = MenuItemDetail.ViewModel(
         item: .fixture(name: "item"),
@@ -149,10 +154,10 @@ func testOnAddingItemToOrderLogsMenuItemDetailOrderedEvent() throws {
 
     viewModel.addOrRemoveFromOrder()
 
-    XCTAssertEqual(eventLoggingSpy.loggedEvents.count, 1)
-    let event = try XCTUnwrap(eventLoggingSpy.loggedEvents.first)
-    XCTAssertEqual(event.name, "menu_item_ordered")
-    XCTAssertEqual(event.properties["item_name"] as? String, "item")
+    #expect(eventLoggingSpy.loggedEvents.count == 1)
+    let event = try #require(eventLoggingSpy.loggedEvents.first)
+    #expect(event.name == "menu_item_ordered")
+    #expect(event.properties["item_name"] as? String == "item")
 }
 ```
 
@@ -174,7 +179,7 @@ If you, like me, are uncomfortable about the fact that the test above could pass
 ```swift
 // MenuItemDetail.ViewModelTests.swift
 // ...
-func testOnRemovingItemToOrderDoesNotLogEvent() throws {
+@Test func onRemovingItemFromOrderDoesNotLogEvent() {
     let eventLoggingSpy = EventLoggingSpy()
     let item = MenuItem.fixture(name: "item")
     let viewModel = MenuItemDetail.ViewModel(
@@ -185,7 +190,7 @@ func testOnRemovingItemToOrderDoesNotLogEvent() throws {
 
     viewModel.addOrRemoveFromOrder()
 
-    XCTAssertEqual(eventLoggingSpy.loggedEvents.count, 0)
+    #expect(eventLoggingSpy.loggedEvents.count == 0)
 }
 ```
 
@@ -244,19 +249,18 @@ class HippoAnalyticsClientInterfaceSpy: HippoAnalyticsClientInterface {
 ```
 
 ```swift
-class EventLoggerTests: XCTestCase {
+@Suite struct EventLoggerTests {
 
-    func testLogsEventsWithCorrectParameters() throws {
+    @Test func logsEventsWithCorrectParameters() throws {
         let hippoAnalyticsSpy = HippoAnalyticsClientInterfaceSpy()
         let eventLogger = EventLogger(hippoAnalyticsClient: hippoAnalyticsSpy)
 
         eventLogger.log(name: "test", properties: ["key": "value"])
 
-        XCTAssertEqual(hippoAnalyticsSpy.loggedEvents.count, 1)
-        let event = try XCTUnwrap(hippoAnalyticsSpy.loggedEvents.first)
-        XCTAssertEqual(event.name, "test")
-        XCTAssertEqual(event.properties?["key"] as? String, "value")
-
+        #expect(hippoAnalyticsSpy.loggedEvents.count == 1)
+        let event = try #require(hippoAnalyticsSpy.loggedEvents.first)
+        #expect(event.name == "test")
+        #expect(event.properties?["key"] as? String == "value")
     }
 }
 ```
