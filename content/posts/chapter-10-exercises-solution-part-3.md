@@ -26,11 +26,9 @@ The codebase defines an abstraction for the component in charge to fetch the men
 
 ```swift
 // MenuFetching.swift
-import Combine
-
 protocol MenuFetching {
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error>
+    func fetchMenu() async throws -> [MenuItem]
 }
 ```
 
@@ -44,9 +42,9 @@ If we were to add a new method to `MenuFetching` it would be appropriate to rena
 ```swift
 protocol ResourceFetching {
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error>
+    func fetchMenu() async throws -> [MenuItem]
 
-    func fetchDishOfTheDay() -> AnyPublisher<MenuItem, Error>
+    func fetchDishOfTheDay() async throws -> MenuItem
 }
 ```
 
@@ -55,7 +53,7 @@ Alternatively, we could leave `MenuFetching` as it is and add a new dedicated ab
 ```swift
 protocol MenuItemFetching {
 
-    func fetchDishOfTheDay() -> AnyPublisher<MenuItem, Error>
+    func fetchDishOfTheDay() async throws -> MenuItem
 }
 ```
 
@@ -108,20 +106,18 @@ class APIClient: DishOfTheDayFetching, MenuFetching {
         self.decoder = decoder
     }
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
+    func fetchMenu() async throws -> [MenuItem] {
         let request = URLRequest(url: baseURL.appendingPathComponent("menu_response.json"))
 
-        return networkFetching.load(request)
-            .decode(type: [MenuItem].self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+        let data = try await networkFetching.load(request)
+        return try decoder.decode([MenuItem].self, from: data)
     }
 
-    func fetchDishOfTheDay() -> AnyPublisher<MenuItem, Error> {
+    func fetchDishOfTheDay() async throws -> MenuItem {
         let request = URLRequest(url: baseURL.appendingPathComponent("dish_of_the_day.json"))
 
-        return networkFetching.load(request)
-            .decode(type: MenuItem.self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+        let data = try await networkFetching.load(request)
+        return try decoder.decode(MenuItem.self, from: data)
     }
 }
 ```
@@ -141,9 +137,8 @@ Looking at the `APIClient` implementation from a distance, we can see both metho
 ```swift
 let request = URLRequest(url: baseURL.appendingPathComponent(<# path #>))
 
-return networkFetching.load(request)
-    .decode(type: <# resource type #>.self, decoder: JSONDecoder())
-    .eraseToAnyPublisher()
+let data = try await networkFetching.load(request)
+return try decoder.decode(<# resource type #>.self, from: data)
 ```
 
 Let’s apply “Don’t Repeat Yourself” and extract this duplication in a dedicated method:
@@ -151,22 +146,21 @@ Let’s apply “Don’t Repeat Yourself” and extract this duplication in a de
 ```swift
 // APIClient.swift
 // ...
-func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
-    return fetch(fromPath: "menu_response.json")
+func fetchMenu() async throws -> [MenuItem] {
+    try await fetch(fromPath: "menu_response.json")
 }
 
-func fetchDishOfTheDay() -> AnyPublisher<MenuItem, Error> {
-    return fetch(fromPath: "dish_of_the_day.json")
+func fetchDishOfTheDay() async throws -> MenuItem {
+    try await fetch(fromPath: "dish_of_the_day.json")
 }
 
 private func fetch<Resource>(
     fromPath path: String
-) -> AnyPublisher<Resource, Error> where Resource: Decodable {
+) async throws -> Resource where Resource: Decodable {
     let request = URLRequest(url: baseURL.appendingPathComponent(path))
 
-    return networkFetching.load(request)
-        .decode(type: Resource.self, decoder: JSONDecoder())
-        .eraseToAnyPublisher()
+    let data = try await networkFetching.load(request)
+    return try decoder.decode(Resource.self, from: data)
 }
 ```
 
@@ -214,20 +208,19 @@ Finally, we can update `APIClient` to use the new `Endpoint` type:
 ```swift
 // APIClient.swift
 // ...
-func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
-    return fetch(from: Endpoints.menu)
+func fetchMenu() async throws -> [MenuItem] {
+    try await fetch(from: Endpoints.menu)
 }
 
-func fetchDishOfTheDay() -> AnyPublisher<MenuItem, Error> {
-    return fetch(from: Endpoints.dishOfTheDay)
+func fetchDishOfTheDay() async throws -> MenuItem {
+    try await fetch(from: Endpoints.dishOfTheDay)
 }
 
 private func fetch<Resource>(
     from endpoint: Endpoint<Resource>
-) -> AnyPublisher<Resource, Error> where Resource: Decodable {
-    return networkFetching.load(endpoint.urlRequest(with: baseURL))
-        .decode(type: endpoint.resourceType, decoder: decoder)
-        .eraseToAnyPublisher()
+) async throws -> Resource where Resource: Decodable {
+    let data = try await networkFetching.load(endpoint.urlRequest(with: baseURL))
+    return try decoder.decode(endpoint.resourceType, from: data)
 }
 ```
 
