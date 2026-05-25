@@ -29,11 +29,12 @@ In the book, we used `dropFirst` to discard that value and check the first and o
 Let’s remove `dropFirst()` and see how our test behaves.
 
 ```swift
-func testPublishedSections() {
+@Test func publishedSections() async {
     var receivedMenu: [MenuItem]?
     let expectedSections = [MenuSection.fixture()]
 
-    let spyClosure: ([MenuItem]) -> [MenuSection] = { items in receivedMenu = items
+    let spyClosure: ([MenuItem]) -> [MenuSection] = { items in
+        receivedMenu = items
         return expectedSections
     }
 
@@ -42,27 +43,27 @@ func testPublishedSections() {
         menuGrouping: spyClosure
     )
 
-    let expectation = XCTestExpectation(
-        description: "Publishes sections built from received menu and given grouping closure"
-    )
+    var cancellables: Set<AnyCancellable> = []
 
-    viewModel
-        .$sections
-        // the .dropFirst() call was here
-        .sink { value in
-            // Ensure the grouping closure is called with the received menu
-            XCTAssertEqual(receivedMenu, menu)
-              // ❌ XCTAssertEqual failed: ("nil") is not equal to...
+    await confirmation("Publishes sections built from received menu and given grouping closure") { confirm in
+        viewModel
+            .$sections
+            // the .dropFirst() call was here
+            .sink { value in
+                // Ensure the grouping closure is called with the received menu
+                #expect(receivedMenu == menu)
+                  // ❌ Expectation failed: receivedMenu == menu (nil vs ...)
 
-            // Ensure the published value is the result of the grouping closure
-            XCTAssertEqual(value, expectedSections)
-              // ❌ XCTAssertEqual failed: ("[]") is not equal to...
+                // Ensure the published value is the result of the grouping closure
+                #expect(value == expectedSections)
+                  // ❌ Expectation failed: value == expectedSections ([] vs ...)
 
-            expectation.fulfill()
-        }
-        .store(in: &cancellables)
+                confirm()
+            }
+            .store(in: &cancellables)
 
-    wait(for: [expectation], timeout: 1)
+        try? await Task.sleep(for: .seconds(1))
+    }
 }
 ```
 
@@ -88,11 +89,12 @@ By looking at the stored values count, we can determine whether to inspect the a
 In our case, we expect to receive an empty value first and a full value second.
 
 ```swift
-func testPublishedSections() {
+@Test func publishedSections() async {
     var receivedMenu: [MenuItem]?
     let expectedSections = [MenuSection.fixture()]
 
-    let spyClosure: ([MenuItem]) -> [MenuSection] = { items in receivedMenu = items
+    let spyClosure: ([MenuItem]) -> [MenuSection] = { items in
+        receivedMenu = items
         return expectedSections
     }
 
@@ -101,59 +103,60 @@ func testPublishedSections() {
         menuGrouping: spyClosure
     )
 
-    let expectation = XCTestExpectation(
-        description: "Publishes sections built from received menu and given grouping closure"
-    )
-
     // This is where we'll collect all the values published by `$sections`
     var values: [[MenuSection]] = []
+    var cancellables: Set<AnyCancellable> = []
 
-    viewModel
-        .$sections
-        .sink { value in
-            // 1. Store the new value the Publisher emitted
-            values = values + [value]
+    await confirmation("Publishes default then sections from received menu and grouping closure") { confirm in
+        viewModel
+            .$sections
+            .sink { value in
+                // 1. Store the new value the Publisher emitted
+                values = values + [value]
 
-            // 2. Inspect the array of received values to decide whether to
-            // continue collecting value.
-            //
-            // We expect to receive two values: the first is the empty array default, the
-            // second the result of the menu fetch.
-            guard values.count == 2 else { return }
+                // 2. Inspect the array of received values to decide whether to
+                // continue collecting value.
+                //
+                // We expect to receive two values: the first is the empty array default, the
+                // second the result of the menu fetch.
+                guard values.count == 2 else { return }
 
-            // 3. At this point, the condition on the received values has been
-            // met and we can assert the values match our expectations.
+                // 3. At this point, the condition on the received values has been
+                // met and we can assert the values match our expectations.
 
-            // 4.a. We expect the first value to be an empty array.
-            //
-            // We cannot use XCTUnwrap here because it throws but `sink` is not declared with
-            // `rethrows`.
-            //
-            // Notice that we could also call force unwrap with `values.first!` because the
-            // `guard` above guarantees we'll have exactly two items at runtime.
-            //
-            // I prefer this more verbose approach because it prevents the tests from crashing
-            // in case the `guard` is accidentally removed.
-            guard let defaultSections = values.first else {
-                return XCTFail("Values has no elements, but expected one")
+                // 4.a. We expect the first value to be an empty array.
+                //
+                // We cannot use `#require` here because it throws but `sink` is not declared
+                // with `rethrows`.
+                //
+                // Notice that we could also call force unwrap with `values.first!` because the
+                // `guard` above guarantees we'll have exactly two items at runtime.
+                //
+                // I prefer this more verbose approach because it prevents the tests from
+                // crashing in case the `guard` is accidentally removed.
+                guard let defaultSections = values.first else {
+                    Issue.record("Values has no elements, but expected one")
+                    return
+                }
+                #expect(defaultSections.isEmpty)
+
+                // 4.b. We expect the second value to have been constructed using
+                // the received sections and the given grouping closure.
+                guard let sections = values[safe: 1] else {
+                    Issue.record("Expected a value at index 1, got none")
+                    return
+                }
+
+                // Ensure the grouping closure is called with the received menu
+                #expect(receivedMenu == menu)
+                // Ensure the published value is the result of the grouping closure
+                #expect(sections == expectedSections)
+                confirm()
             }
-            XCTAssertTrue(defaultSections.isEmpty)
+            .store(in: &cancellables)
 
-            // 4.b. We expect the second value to have been constructed using
-            // the received sections and the given grouping closure.
-            guard let sections = values[safe: 1] else {
-                return XCTFail("Expected a value at index 1, got none")
-            }
-
-            // Ensure the grouping closure is called with the received menu
-            XCTAssertEqual(receivedMenu, menu)
-            // Ensure the published value is the result of the grouping closure
-            XCTAssertEqual(sections, expectedSections)
-            expectation.fulfill()
-        }
-        .store(in: &cancellables)
-
-    wait(for: [expectation], timeout: 1)
+        try? await Task.sleep(for: .seconds(1))
+    }
 }
 ```
 
