@@ -110,10 +110,10 @@ We already have a test for the ViewModel behavior when the request start:
 ```swift
 // MenuList.ViewModelTests
 // ...
-func testWhenFetchingStartsPublishesEmptyMenu() throws {
+@Test func whenFetchingStartsPublishesEmptyMenu() throws {
     let viewModel = MenuList.ViewModel(menuFetching: MenuFetchingStub(returning: .success([])))
 
-    XCTAssertTrue(try viewModel.sections.get().isEmpty)
+    #expect(try viewModel.sections.get().isEmpty)
 }
 ```
 
@@ -122,12 +122,12 @@ Let’s update it to expect it to publish `loading` instead:
 ```swift
 // MenuList.ViewModelTests
 // ...
-func testWhenFetchingStartsPublishesLoading() throws {
+@Test func whenFetchingStartsPublishesLoading() {
     let viewModel = MenuList.ViewModel(menuFetching: MenuFetchingStub(returning: .success([])))
 
     switch viewModel.sections {
     case .loading: break
-    case _: XCTFail("Expected .loading, got \(viewModel.sections)")
+    default: Issue.record("Expected .loading, got \(viewModel.sections)")
     }
 }
 ```
@@ -196,16 +196,20 @@ Still, as much as I trust the setup, it doesn’t hurt to give it a run-through 
 
 To help with that, we can force a delay in the delivery of the menu sections, so our slow brain has the time to look at the app and check it works as expected.
 
-Combine offers a delay(for:tolerance:scheduler:options:) method on `Publisher` that we can use for this.
+Combine offers a `delay(for:tolerance:scheduler:options:)` method on `Publisher` that we can use for this. With async/await, an equivalent is to `Task.sleep` before publishing the value:
 
 ```swift
 // MenuList.ViewModel.swift
 // ...
-menuFetching
-    .fetchMenu()
-    .map(menuGrouping)
-    .delay(for: 2, scheduler: RunLoop.main)
-    .sink(/* ... */)
+private func fetchMenu() async {
+    do {
+        let items = try await menuFetching.fetchMenu()
+        try? await Task.sleep(for: .seconds(2))
+        sections = .success(menuGrouping(items))
+    } catch {
+        sections = .failure(error)
+    }
+}
 ```
 
 <!-- TODO(TODO.md): restore `albertos-loading-demo.gif` — asset wasn't captured on wayback.
@@ -218,24 +222,27 @@ menuFetching
 
 Fun fact. When working on this code, I added the delay call, verified it worked, and then took a break. Once back on it, I run the unit tests, *as one does when picking up a codebase after a break*, and they failed. I spent a good 5 minutes scratching my head trying to figure out why and eventually realized the timeout in the tests was 1 second, and I had the delay set to 2 seconds.
 
-To avoid being a victim of my forgetfulness again in the future, I wrote a custom delay implementation that only runs in debug and not as part of the unit tests:
+To avoid being a victim of my forgetfulness again in the future, I wrote a custom delay helper that only runs in debug and not as part of the unit tests:
 
 ```swift
-// Publisher+DebugDelay.swift
-import Combine
+// Task+DebugDelay.swift
 import Foundation
 
-extension Publisher {
+extension Task where Success == Never, Failure == Never {
 
-    /// In DEBUG, delay the publishing by the given `interval`. In other build configurations or
-    /// when running the tests, discard.
-    func debugDelayOnMainThread(for interval: RunLoop.SchedulerTimeType.Stride) -> Publishers.Delay<Self, RunLoop> {
-        var computedInterval: RunLoop.SchedulerTimeType.Stride = 0
+    /// In DEBUG, sleep for the given duration. In other configurations or when running
+    /// under XCTest/Swift Testing, return immediately.
+    static func debugDelay(for duration: Duration) async {
         #if DEBUG
-        computedInterval = NSClassFromString("XCTestCase") == nil ? interval : 0
+        let isTesting = NSClassFromString("XCTestCase") != nil
+            || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        guard !isTesting else { return }
+        try? await Task.sleep(for: duration)
         #endif
-
-        return delay(for: computedInterval, scheduler: RunLoop.main)
     }
 }
 ```
+
+## A note on `@Observable`
+
+For projects on iOS 17+ targeting `@Observable`, the same approach works: declare `var sections: RemoteData<[MenuSection], Error> = .notAsked` on an `@Observable class` and SwiftUI will re-render on assignment.
