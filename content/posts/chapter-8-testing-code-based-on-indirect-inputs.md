@@ -356,6 +356,8 @@ From the Xcode 10 release notes:
 > Test parallelization occurs by distributing the test classes in a target across\
 > multiple runner processes.
 
+Xcode 16 and Swift Testing extend this further: parallelization in Swift Testing is per-test by default, not per-class. The principle of safely cancelling unrelated subscriptions in a test still applies regardless of granularity.
+
 I somehow preferred storing the `AnyCancellable` value locally when writing the test, but I don’t have a strong rationale for choosing one option instead of the other.
 
 ### Alternative 2: Use a single `sink`
