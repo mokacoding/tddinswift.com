@@ -11,7 +11,7 @@ OHHTTPStubs offers a smooth DSL to stub just about any kind of network request y
 
 You can fetch the library using your favorite dependency management system and access it in your code by importing both the `OHHTTPStubs` module and its Swift helpers companion, `OHHTTPStubsSwift`.
 
-In the code from the book, we can test how `MenuFetcher` processes data it receives from the network using OHTTPStubs instead of passing a `NetworkFetchingStub` instance:
+In the code from the book, we can test how `MenuFetcher` processes data it receives from the network using OHHTTPStubs instead of passing a `NetworkFetchingStub` instance:
 
 ```swift
 @testable import Albertos
@@ -71,7 +71,7 @@ I won’t go into the details of the DSL, but you can read more about it in the 
 
 ## OHHTTPStubs use case
 
-OHTTPStubs’ ability to hijack `URLSession` without any extra setup required in the test suite or production code makes it an invaluable ally in *test rescues*. If the code you are dealing with is convoluted and hard to modify, OHTTPStubs can be your mightiest ally to build confidence in the networking code through tests. When it’s dangerous or time-consuming to use Dependency Inversion and Injection, not having to do any extra setup in the production code can be a lifesaver.
+OHHTTPStubs’ ability to hijack `URLSession` without any extra setup required in the test suite or production code makes it an invaluable ally in *test rescues*. If the code you are dealing with is convoluted and hard to modify, OHHTTPStubs can be your mightiest ally to build confidence in the networking code through tests. When it’s dangerous or time-consuming to use Dependency Inversion and Injection, not having to do any extra setup in the production code can be a lifesaver.
 
 On the other hand, I tend not to bring it into my projects when I start from scratch. As powerful and convenient as the library is, I fear being able to seamlessly stub network requests might make me miss good opportunities to improve my design. I find value in abstracting `URLSession` behind a protocol like `NetworkFetching`. Even though `URLSession` is the only concrete implementation my apps will ever use, having a `protocol` tailored to the networking needs of my project reduces the surface area of options accessible to the code interfacing with it, enhancing local reasoning.
 
