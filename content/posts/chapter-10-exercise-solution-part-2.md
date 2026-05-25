@@ -3,6 +3,7 @@ title: 'Chapter 10 – Exercise Solution Part 2'
 date: 2021-07-21T20:38:19+00:00
 description: "Chapter 10 – Testing Network Code – Exercises Solution Part 2: How to test the URLRequest configuration with a Spy Test-Driven Development in Swift’s Chapter 10 shows how to use TDD to implem…"
 slug: chapter-10-exercise-solution-part-2
+edition_compatibility: ["v2"]
 ---
 
 Part 2: How to test the `URLRequest` configuration with a Spy

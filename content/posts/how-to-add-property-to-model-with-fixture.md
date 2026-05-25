@@ -3,6 +3,7 @@ title: 'Chapter 5 – Exercise Solution'
 date: 2021-07-11T19:53:46+00:00
 description: "Chapter 5: Changing Tests with Fixtures – Exercise Solution In Chapter 5, we learned about the Fixture Extension technique.Defining a .fixture() method to initialize our domain types in the unit te…"
 slug: how-to-add-property-to-model-with-fixture
+edition_compatibility: ["v1", "v2"]
 ---
 
 In Chapter 5, we learned about the Fixture Extension technique.\

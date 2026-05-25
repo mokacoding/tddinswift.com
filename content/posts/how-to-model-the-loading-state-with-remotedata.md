@@ -3,6 +3,7 @@ title: 'How to model the loading state with RemoteData'
 date: 2021-07-18T11:21:14+00:00
 description: "How to model the loading state with RemoteData Alberto’s menu ordering app, which we built piece by piece throughout the book, is a real-world application in the sense that it has all the mos…"
 slug: how-to-model-the-loading-state-with-remotedata
+edition_compatibility: ["v2"]
 ---
 
 Alberto’s menu ordering app, which we built piece by piece throughout the book, is a real-world application in the sense that it has all the most common ingredients of the apps you’ll find yourself building on the job.\

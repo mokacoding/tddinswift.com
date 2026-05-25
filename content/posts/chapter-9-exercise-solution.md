@@ -3,6 +3,7 @@ title: 'Chapter 9 Exercise Solution'
 date: 2021-07-18T21:26:58+00:00
 description: "Chapter 9: Testing JSON Decoding – Exercise Solution Swift’s Decodable provides a native, robust, and flexible way to parse JSON data into a domain object. Gone are the days where we’d …"
 slug: chapter-9-exercise-solution
+edition_compatibility: ["v2"]
 ---
 
 Swift’s `Decodable` provides a native, robust, and flexible way to parse JSON data into a domain object. Gone are the days where we’d see a new open-source Swift JSON parser published every week.

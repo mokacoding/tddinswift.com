@@ -3,6 +3,7 @@ title: 'Chapter 10 – Exercises Solution – Part 3'
 date: 2021-07-23T20:48:35+00:00
 description: "Chapter 10 – Testing Network Code – Exercise Solution Part 3: How to keep code tidy when implementing multiple API endpoint The Test-Driven Development in Swift chapter on using TDD with networking…"
 slug: chapter-10-exercises-solution-part-3
+edition_compatibility: ["v2"]
 ---
 
 ## Part 3: How to keep code tidy when implementing multiple API endpoint

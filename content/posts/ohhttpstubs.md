@@ -3,6 +3,7 @@ title: 'OHHTTPStubs'
 date: 2021-08-01T20:57:52+00:00
 description: "Network testing with OHHTTPStubs Throughout Test-Driven Development in Swift, we wrote tests using vanilla XCTest because it’s the lowest common denominator for any testing you might do in yo…"
 slug: ohhttpstubs
+edition_compatibility: ["v2"]
 ---
 
 Throughout [*Test-Driven Development in Swift*](/), we wrote tests using vanilla XCTest because it’s the lowest common denominator for any testing you might do in your Swift applications. That’s not to say that third-party libraries cannot provide helpful support in practicing TDD. At the end of Chapter 10, where we discussed networking, I mentioned a noteworthy open-source library called OHHTTPStubs.

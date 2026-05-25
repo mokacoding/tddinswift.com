@@ -3,6 +3,7 @@ title: 'Chapter 7 – Exercise Solution'
 date: 2021-07-11T21:07:10+00:00
 description: "Chapter 7: Testing Dynamic Swift Views – Exercise Solution In Chapter 7, we learned how SwiftUI and Combine work together to keep the view up to date seamlessly.We saw how to configure an Observabl…"
 slug: chapter-7-exercise-solution
+edition_compatibility: ["v2"]
 ---
 
 In Chapter 7, we learned how SwiftUI and Combine work together to keep the view up to date seamlessly.\

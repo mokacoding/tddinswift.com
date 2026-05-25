@@ -3,6 +3,7 @@ title: 'Chapter 8 – Exercise Solution'
 date: 2021-07-16T01:01:57+00:00
 description: "Chapter 8: Testing Code Based on Indirect Inputs – Exercise Solution Chapter 8 introduced the concept of Test Doubles, test-specific equivalents of production dependencies, and learned how to build…"
 slug: chapter-8-testing-code-based-on-indirect-inputs
+edition_compatibility: ["v2"]
 ---
 
 Chapter 8 introduced the concept of Test Doubles, test-specific equivalents of production dependencies, and learned how to build a Stub to control the indirect inputs a dependency provides to the System Under Test.

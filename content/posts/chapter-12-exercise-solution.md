@@ -3,6 +3,7 @@ title: 'Chapter 12 – Exercise Solution'
 date: 2021-07-28T20:40:25+00:00
 description: "Chapter 12: Testing Side Effects – Exercise Solution After writing a dozen methods using Test-Driven Development, you’ll likely notice that the easier tests to write are those for code that t…"
 slug: chapter-12-exercise-solution
+edition_compatibility: ["v2"]
 ---
 
 After writing a dozen methods using Test-Driven Development, you’ll likely notice that the easier tests to write are those for code that takes one or more inputs and returns an output.\

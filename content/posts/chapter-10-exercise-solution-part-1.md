@@ -3,6 +3,7 @@ title: 'Chapter 10 – Exercise Solution Part 1'
 date: 2021-07-20T00:43:03+00:00
 description: "Chapter 10 – Testing Network Code – Exercises Solution Part 1: How to test the URLRequest configuration with a Stub It’s rare to find an app that doesn’t rely on a backend service to re…"
 slug: chapter-10-exercise-solution-part-1
+edition_compatibility: ["v2"]
 ---
 
 ## Part 1: How to test the `URLRequest` configuration with a Stub
