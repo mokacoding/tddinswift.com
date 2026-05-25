@@ -2,8 +2,8 @@
   <main class="max-w-3xl mx-auto px-4 pt-16">
     <!-- Cover Image -->
     <div class="text-center mb-10">
-      <a href="{{V2_APRESS_URL}}">
-        <img src="{{V2_COVER_URL}}"
+      <a href="{{ `{{V2_APRESS_URL}}` | safeURL }}">
+        <img src="{{ `{{V2_COVER_URL}}` | safeURL }}"
              alt="Test-Driven Development in Swift, Second Edition cover"
              class="mx-auto w-72 md:w-80 rounded-md shadow-lg shadow-black/40" />
       </a>
@@ -21,11 +21,11 @@
 
     <!-- CTA Buttons -->
     <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-      <a href="{{V2_APRESS_URL}}"
+      <a href="{{ `{{V2_APRESS_URL}}` | safeURL }}"
          class="bg-secondary text-background font-medium px-6 py-3 rounded hover:bg-secondary-hover transition text-center">
         Get it from the publisher
       </a>
-      <a href="{{V2_AMAZON_URL}}"
+      <a href="{{ `{{V2_AMAZON_URL}}` | safeURL }}"
          class="bg-primary text-background font-medium px-6 py-3 rounded hover:bg-primary-hover transition text-center">
         Get it on Amazon
       </a>
