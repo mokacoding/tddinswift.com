@@ -67,9 +67,11 @@ stub(condition: pathEndsWith("menu_response.json")) { _ in
 }
 ```
 
-I won’t go into the details of the DSL, but you can read more about it in the official usage examples.
+I won’t go into the details of the DSL, but you can read more about it in the [official usage examples](https://github.com/AliSoftware/OHHTTPStubs/wiki/Usage-Examples).
 
 ## OHHTTPStubs use case
+
+OHHTTPStubs has been minimally maintained for several years; its README acknowledges limitations with Swift Concurrency. If you’re starting a v2-era project and don’t have OHHTTPStubs already in your codebase, consider alternatives such as [Mocker](https://github.com/WeTransfer/Mocker) or rolling your own `URLProtocol` subclass. They integrate cleanly with `async`/`await` and require no Objective-C runtime hooks.
 
 OHHTTPStubs’ ability to hijack `URLSession` without any extra setup required in the test suite or production code makes it an invaluable ally in *test rescues*. If the code you are dealing with is convoluted and hard to modify, OHHTTPStubs can be your mightiest ally to build confidence in the networking code through tests. When it’s dangerous or time-consuming to use Dependency Inversion and Injection, not having to do any extra setup in the production code can be a lifesaver.
 
