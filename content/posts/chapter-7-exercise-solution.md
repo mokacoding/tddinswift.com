@@ -105,7 +105,7 @@ func testPublishedSections() {
         description: "Publishes sections built from received menu and given grouping closure"
     )
 
-    // This is were we'll collect all the values published by `$sections`
+    // This is where we'll collect all the values published by `$sections`
     var values: [[MenuSection]] = []
 
     viewModel
@@ -162,4 +162,4 @@ This new version of the test passes.
 To recap: To test a `Publisher` behavior over multiple emitted values, you need to collect the values by subscribing to it with `sink`.\
 Once you’ve collected as many values as expected for the behavior under test, you can inspect each value in order and run the appropriate assertions on it.
 
-*For more examples of how to test different Combine `Publisher` behaviors, checkout my Unit Testing Combine Publisher Cheatsheet.*
+*For more examples of how to test different Combine `Publisher` behaviors, checkout my [Unit Testing Combine Publisher Cheatsheet](https://mokacoding.com/blog/unit-testing-combine-publisher-cheatsheet/).*
