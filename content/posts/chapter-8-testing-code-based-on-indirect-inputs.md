@@ -222,7 +222,7 @@ Seeing the test fail also validates its ability to recognize incorrect behavior 
 
 ### Step 4: Make the test pass
 
-Thanks to the refactor we did in Step 1, making the test pass require nothing more that calling the ViewModel `fetchMenu()` method from `retry()`:
+Thanks to the refactor we did in Step 1, making the test pass requires nothing more than calling the ViewModel `fetchMenu()` method from `retry()`:
 
 ```swift
 func retry() {
