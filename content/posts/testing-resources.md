@@ -23,6 +23,12 @@ If you enjoyed [*Test-Driven Development in Swift*](/) and are hungry for more r
 
 [*The Secret Skills of Productive Programmers*](https://codewithoutrules.com/productive-programmer/) by Itamar Turner-Trauring is a little-known gem. The book is not about testing or coding but focuses instead on the mindset and practices that will help you create more value as a software developer.
 
+[*Modern Concurrency in Swift*](https://www.kodeco.com/books/modern-concurrency-in-swift) by Marin Todorov is a thorough walkthrough of `async`/`await`, structured concurrency, and actors — the foundations on which v2 of *Test-Driven Development in Swift* builds its testing approach.
+
+[*99 Bottles of OOP*](https://sandimetz.com/99bottles) by Sandi Metz is a masterclass in incremental refactoring driven by tests. Even though the examples are in Ruby, the small-steps discipline transfers cleanly to Swift.
+
+[*Practical Object-Oriented Design in Ruby (POODR)*](https://sandimetz.com/products) by Sandi Metz is, as the title hints, a Ruby book — but the design principles, particularly around dependencies and message passing, are language-agnostic and worth the read for any Swift developer.
+
 ## Blogs
 
 I already mentioned Jon Reid’s book but be sure to follow his blog [Quality Coding](https://qualitycoding.org), too.
@@ -41,6 +47,10 @@ Of course, I would be remiss if I didn’t mention *my* blog [mokacoding](https:
 
 Finally, Kent Beck has infinite wisdom to share on building good software. [Kent Beck’s Substack](https://tidyfirst.substack.com) is the home of his ongoing work that produced [*Tidy First?*](https://www.amazon.com/Tidy-First-Personal-Exercise-Empirical/dp/1098151232) and the books that follow.
 
+[Point-Free](https://www.pointfree.co) is the place to go for in-depth functional Swift, dependencies, and testing.
+
+Apple's official [Swift Testing documentation](https://developer.apple.com/documentation/testing) covers the framework v2 of *Test-Driven Development in Swift* builds on.
+
 ## Podcasts
 
 I found [Test & Code](https://testandcode.com) by Brian Okken to be the podcast that most consistently delivers quality conversations on testing. It mainly covers Python topics, but most of the principles transfer nicely to Swift, too.\
@@ -53,6 +63,8 @@ Check out this episode for example.
 Similarly, [Rails with Jason](https://www.codewithjason.com/rails-with-jason-podcast) by Jason Swett doesn’t cover testing explicitly, but the topic often comes up. I love how Jason interviews guests, relentlessly asking questions to dig deep on each topic.
 
 I recorded a couple of interviews on testing with the [Empower Apps](https://www.empowerappshow.com) and [Compile Swift](https://compileswift.com) podcasts which you should check out.
+
+If you’d rather watch than listen, [Point-Free](https://www.pointfree.co) also has a deep recorded series on Swift Testing and dependencies that is worth your time.
 
 ------------------------------------------------------------------------
 
