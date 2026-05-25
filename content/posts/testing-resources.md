@@ -68,4 +68,4 @@ If you’d rather watch than listen, [Point-Free](https://www.pointfree.co) also
 
 ------------------------------------------------------------------------
 
-What are your favorite resources to learn about testing and software practices? Know some that ought to be on this list? Get in touch on Twitter at @mokagio or email me at [hello@tddinswift.com](#).
+What are your favorite resources to learn about testing and software practices? Know some that ought to be on this list? Get in touch on X [@mokagio](https://x.com/mokagio) or email me at [hello@tddinswift.com](mailto:hello@tddinswift.com).

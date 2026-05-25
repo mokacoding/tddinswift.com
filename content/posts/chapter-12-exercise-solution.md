@@ -87,7 +87,7 @@ The `eventLogging` parameter is what Michael Feathers calls *seam* in Working Ef
 
 It might be tempting to log the event in the ViewModel `init` method, but keep in mind that there is no guarantee that the app will initialize a ViewModel instance and render the view using it in direct sequence.\
 In fact, if you add a breakpoint or a `print` statement in `MenuItemDetail.ViewModel`‘s `init` method then run the app, you’ll notice that as soon as the menu list loads on the screen, all the ViewModels for each of the visible items initialize.\
-*If you know of a way to lazy load them, please get in touch on Twitter at @mokagio or write to [hello@tddinswift.com](#)*.
+*If you know of a way to lazy load them, please get in touch on X [@mokagio](https://x.com/mokagio) or write to [hello@tddinswift.com](mailto:hello@tddinswift.com)*.
 
 A better point in the view life-cycle where to log the event is when the view actually renders.\
 SwiftUI offers the onAppear(perform:) method on `View` to hook up to that precise life-cycle moment.

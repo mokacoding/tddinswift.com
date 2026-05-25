@@ -246,4 +246,4 @@ That’s all to say, networking is a complicated part of application development
 I hope the book and this series of posts have given you good food for thought on how to approach the networking needs of your own software projects.
 
 As always, I’m keen to hear what you think.\
-Get in touch on Twitter @mokagio or email me at [hello@tddinswift.com](#).
+Get in touch on X [@mokagio](https://x.com/mokagio) or email me at [hello@tddinswift.com](mailto:hello@tddinswift.com).
