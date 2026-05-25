@@ -15,44 +15,32 @@ In the code from the book, we can test how `MenuFetcher` processes data it recei
 
 ```swift
 @testable import Albertos
-import Combine
 import OHHTTPStubs
 import OHHTTPStubsSwift
-import XCTest
+import Testing
+import Foundation
 
-class MenuFetcherOHHTTPStubsTests: XCTestCase {
+@Suite struct MenuFetcherOHHTTPStubsTests {
 
-    var cancellables = Set<AnyCancellable>()
-
-    func testWhenRequestSucceedsPublishesDecodedMenuItems() throws {
+    @Test func whenRequestSucceedsReturnsDecodedMenuItems() async throws {
         let json = """
-[
-    { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 },
-    { "name": "another name", "category": "a category", "spicy": true, "price": 2.0 }
-]
-"""
-        let data = try XCTUnwrap(json.data(using: .utf8))
+        [
+            { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 },
+            { "name": "another name", "category": "a category", "spicy": true, "price": 2.0 }
+        ]
+        """
+        let data = try #require(json.data(using: .utf8))
         let menuFetcher = MenuFetcher()
 
         stub(condition: pathEndsWith("menu_response.json")) { _ in
             HTTPStubsResponse(data: data, statusCode: 200, headers: .none)
         }
 
-        let expectation = XCTestExpectation(description: "Publishes decoded [MenuItem]")
+        let items = try await menuFetcher.fetchMenu()
 
-        menuFetcher.fetchMenu()
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { items in
-                    XCTAssertEqual(items.count, 2)
-                    XCTAssertEqual(items.first?.name, "a name")
-                    XCTAssertEqual(items.last?.name, "another name")
-                    expectation.fulfill()
-                }
-            )
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
+        #expect(items.count == 2)
+        #expect(items.first?.name == "a name")
+        #expect(items.last?.name == "another name")
     }
 }
 ```
