@@ -32,9 +32,9 @@ As we discussed in Chapter 9, `Decodable` is so powerful that, in many circumsta
 
 That there’s nothing fancier than adding a sort of Data Transfer Object is a treat in and of itself, though, yet another example of how straightforward JSON can be in Swift.
 
-The test one would write for this object’s has the same structure as those we wrote in the chapter. While looking at it in this bonus content post, I want to discuss something I didn’t touch on in the book: **you can iterate on the tests the same way you iterate on the code.** You can start with a broad strokes test, make it pass, then progressively make its assertions shaper, adjusting the production code accordingly.
+The test one would write for this object has the same structure as those we wrote in the chapter. While looking at it in this bonus content post, I want to discuss something I didn’t touch on in the book: **you can iterate on the tests the same way you iterate on the code.** You can start with a broad strokes test, make it pass, then progressively make its assertions shaper, adjusting the production code accordingly.
 
-Let’s imagine this change of API response comes after you already wrote all the for `MenuItem`. How would we go about updating the software to work with it?
+Let’s imagine this change of API response comes after you already wrote all the tests for `MenuItem`. How would we go about updating the software to work with it?
 
 It all starts with a test for the new response:
 
@@ -84,7 +84,7 @@ class MenuResponseTests: XCTestCase {
 struct MenuResponse: Decodable {}
 ```
 
-What kind of assertion or assertions can we write? At this point, `MenuResponse` is but a placeholder implementation. Before moving on with the actual, I want to ensure all the scaffolding is in place, so I’ll just ensure that the doesn’t throw. *Take small steps.*
+What kind of assertion or assertions can we write? At this point, `MenuResponse` is but a placeholder implementation. Before moving on with the actual implementation, I want to ensure all the scaffolding is in place, so I’ll just ensure that the test doesn’t throw. *Take small steps.*
 
 ```swift
 // Act + Assert
@@ -93,7 +93,7 @@ XCTAssertNoThrow(try JSONDecoder().decode(MenuResponse.self, from: data))
 
 This test passes. I might actually commit the code as it is, with a title like “Add `MenuResponse` `Decodable` type – Empty for the moment”.
 
-Next, how can we get help from the test to ensure the of the items from the JSON takes place? We can start by ensuring that `MenuResponse` has a `items: [MenuItem]` property with two items.
+Next, how can we get help from the test to ensure the decoding of the items from the JSON takes place? We can start by ensuring that `MenuResponse` has a `items: [MenuItem]` property with two items.
 
 ```swift
 // Act
@@ -114,7 +114,7 @@ struct MenuResponse: Decodable {
 }
 ```
 
-The test compiles and passes, too, because we’ve done all the work to configure `MenuItem`‘s in the book.
+The test compiles and passes, too, because we’ve done all the work to configure `MenuItem` decoding in the book.
 
 What now? Well, if I were a bit paranoid, I’d want to ensure that the elements that go into `items` are actually decoded from the input JSON:
 
@@ -172,7 +172,7 @@ XCTAssertEqual(response.items.first?.name, "spaghetti carbonara")
 XCTAssertEqual(response.items.last?.name, "penne all'arrabbiata")
 ```
 
-Yet anther option is to fold `MenuItemTests` into `MenuResponseTests`.\
+Yet another option is to fold `MenuItemTests` into `MenuResponseTests`.\
 We can keep the fine-grained assertions in the test for the response and delete the redundant test for the individual `MenuItem`.
 
 Software is *soft*! It’s malleable and easy to change. That applies to production software but also to its tests.
