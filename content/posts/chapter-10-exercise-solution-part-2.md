@@ -56,7 +56,7 @@ The Spy implementation is similar to the Stub from Chapter 10. Like the Stub, it
 
 In the `load(_:)` implementation, the Spy stores the `URLRequest` input parameter in a `private(set)` variable so that consumers can read it but not accidentally modify it.
 
-Unlike the Stub, though, the Spy doesn’t allow configuring the `load(_:)` return value but has a hardcoded return value. In this implementation I chose to return an error, but you could as well return a successful value by making `MenuFetcher` conform to `Encodable` and using:
+Unlike the Stub, though, the Spy doesn’t allow configuring the `load(_:)` return value but has a hardcoded return value. In this implementation I chose to return an error, but you could as well return a successful value by making `MenuItem` conform to `Encodable` and using:
 
 ```swift
 .success(try! JSONEncoder().encode([MenuItem.fixture()]))
