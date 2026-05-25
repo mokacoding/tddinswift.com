@@ -32,22 +32,15 @@ In our case, the indirect output is the `URLRequest` that `MenuFetcher` builds a
 ```swift
 // NetworkFetchingSpy.swift
 @testable import Albertos
-import Combine
 import Foundation
 
 class NetworkFetchingSpy: NetworkFetching {
 
     private(set) var request: URLRequest?
 
-    func load(_ request: URLRequest) -> AnyPublisher<Data, URLError> {
+    func load(_ request: URLRequest) async throws -> Data {
         self.request = request
-
-        return Result<Data, URLError>
-            .failure(URLError(.badURL))
-            .publisher
-            // Use a delay to simulate the real world async behavior
-            .delay(for: 0.01, scheduler: RunLoop.main)
-            .eraseToAnyPublisher()
+        throw URLError(.badURL)
     }
 }
 ```
@@ -73,45 +66,19 @@ Here’s how to use the Spy to check the `URLRequest` that `MenuFetcher` produce
 ```swift
 // MenuFetcherTests.swift
 // ...
-func testUsesGivenBaseURLInRequest() {
+@Test func usesGivenBaseURLInRequest() async {
     let spy = NetworkFetchingSpy()
     let menuFetcher = MenuFetcher(networkFetching: spy)
 
-    let expectation = XCTestExpectation(description: "Request succeeds")
+    _ = try? await menuFetcher.fetchMenu()
 
-    menuFetcher.fetchMenu()
-        .sink(
-            receiveCompletion: { _ in expectation.fulfill() },
-            receiveValue: { _ in }
-        )
-        .store(in: &cancellables)
-
-    wait(for: [expectation], timeout: 1)
-
-    XCTAssert(spy.request?.url?.absoluteString == "https://raw.githubusercontent.com/mokagio/tddinswift_fake_api/trunk/menu_response.json")
+    #expect(spy.request?.url?.absoluteString == "https://raw.githubusercontent.com/mokagio/tddinswift_fake_api/trunk/menu_response.json")
 }
 ```
 
 What the test does is arranging `MenuFetcher` with `NetworkFetchingSpy`, acting on it via `fetchMenu()`, and asserting how it formed the `URLRequest` after waiting for the fetch to complete.
 
-As I mentioned in the book, while using vanilla XCTest keeps your test suite setup lean, this testing framework from Apple has poor ergonomics when it comes to its assertion APIs. Using Nimble, discussed in the book’s Appendix B, makes the test clearer:
-
-```swift
-// MenuFetcherTests.swift
-// ...
-import Nimble
-
-// ...
-func testUsesGivenBaseURLInRequest() {
-    let spy = NetworkFetchingSpy()
-    let menuFetcher = MenuFetcher(networkFetching: spy)
-
-    _ = menuFetcher.fetchMenu()
-
-    expect(spy.request?.url?.absoluteString)
-        .toEventually(equal("https://raw.githubusercontent.com/mokagio/tddinswift_fake_api/trunk/menu_response.json"))
-}
-```
+As I mentioned in the book, Swift Testing's `#expect` macro pairs naturally with `async`/`await`, so the additional matcher library is no longer needed for ergonomics. If you prefer Nimble's BDD-style matchers, they're discussed in the book's Appendix C.
 
 ## Base URL with Spy — Step 3: Add the base URL parameter to `MenuFetcher`
 
@@ -121,7 +88,6 @@ The refactoring steps are the same as what we did in the [previous article](/cha
 
 ```swift
 // MenuFetcher.swift
-import Combine
 import Foundation
 
 class MenuFetcher: MenuFetching {
@@ -137,12 +103,11 @@ class MenuFetcher: MenuFetching {
         self.networkFetching = networkFetching
     }
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
+    func fetchMenu() async throws -> [MenuItem] {
         let request = URLRequest(url: baseURL.appendingPathComponent("menu_response.json"))
 
-        return networkFetching.load(request)
-            .decode(type: [MenuItem].self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+        let data = try await networkFetching.load(request)
+        return try JSONDecoder().decode([MenuItem].self, from: data)
     }
 }
 ```
@@ -150,17 +115,16 @@ class MenuFetcher: MenuFetching {
 ```swift
 // MenuFetcherTests.swift
 // ...
-func testUsesGivenBaseURLInRequest() throws {
+@Test func usesGivenBaseURLInRequest() async throws {
     let spy = NetworkFetchingSpy()
     let menuFetcher = MenuFetcher(
-        baseURL: try XCTUnwrap(URL(string: "https://test.fake")),
+        baseURL: try #require(URL(string: "https://test.fake")),
         networkFetching: spy
     )
 
-    _ = menuFetcher.fetchMenu()
+    _ = try? await menuFetcher.fetchMenu()
 
-    expect(spy.request?.url?.absoluteString)
-        .toEventually(equal("https://test.fake/menu_response.json"))
+    #expect(spy.request?.url?.absoluteString == "https://test.fake/menu_response.json")
 }
 ```
 
@@ -169,39 +133,30 @@ func testUsesGivenBaseURLInRequest() throws {
 So, which approach is better to help us verify the `URLRequest` creation?\
 Stub or Spy?
 
-As a reminder, here’s the test implemented using a Stub Test Double from the [previous post](/chapter-10-exercise-solution-part-1/), converted to use Nimble, too, to make the comparison fair:
+As a reminder, here's the test implemented using a Stub Test Double from the [previous post](/chapter-10-exercise-solution-part-1/):
 
 ```swift
 // MenuFetcherTests.swift
 // ...
-func testUsesGivenBaseURLInRequest() throws {
-    let baseURL = try XCTUnwrap(URL(string: "https://test.url"))
+@Test func usesGivenBaseURLInRequest() async throws {
+    let baseURL = try #require(URL(string: "https://test.url"))
     let url = baseURL.appendingPathComponent("menu_response.json")
     let json = """
-[
-    { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }
-]
-"""
-    let data = try XCTUnwrap(json.data(using: .utf8))
+    [
+        { "name": "a name", "category": "a category", "spicy": true, "price": 1.0 }
+    ]
+    """
+    let data = try #require(json.data(using: .utf8))
     let networkFetchingStub = NetworkFetchingStub(
         returning: .success(data),
         for: URLRequest(url: url)
     )
     let menuFetcher = MenuFetcher(baseURL: baseURL, networkFetching: networkFetchingStub)
 
-    waitUntil { done in
-        menuFetcher.fetchMenu()
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { _ in
-                    // We don't care about the values received. We're only interested to know
-                    // that we're here instead than in the failure branch, which means the
-                    // request received by the Stub matched our expectation.
-                    done()
-                }
-            )
-            .store(in: &self.cancellables)
-    }
+    // We don't care about the values received. We're only interested to know
+    // the call completes without throwing, which means the request received by
+    // the Stub matched our expectation.
+    _ = try await menuFetcher.fetchMenu()
 }
 ```
 
