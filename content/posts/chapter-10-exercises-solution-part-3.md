@@ -96,13 +96,16 @@ class APIClient: DishOfTheDayFetching, MenuFetching {
 
     let networkFetching: NetworkFetching
     let baseURL: URL
+    let decoder: JSONDecoder
 
     init(
         baseURL: URL = URL(string: "https://raw.githubusercontent.com/mokagio/tddinswift_fake_api/trunk")!,
-        networkFetching: NetworkFetching = URLSession.shared
+        networkFetching: NetworkFetching = URLSession.shared,
+        decoder: JSONDecoder = JSONDecoder()
     ) {
         self.baseURL = baseURL
         self.networkFetching = networkFetching
+        self.decoder = decoder
     }
 
     func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
@@ -186,7 +189,7 @@ import Foundation
 
 struct Endpoint<Resource: Decodable> {
     let path: String
-    let resourceType = T.self
+    let resourceType = Resource.self
 
     func urlRequest(with baseURL: URL) -> URLRequest {
         URLRequest(url: baseURL.appendingPathComponent(path))
