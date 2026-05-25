@@ -83,7 +83,7 @@ init(
     // ...
 ```
 
-The `eventLoggin` parameter is what Micheal Feathers calls *seam* in Working Effectively with Legacy Code. We can use this seam to insert a Test Double to write tests for the logging behavior.
+The `eventLogging` parameter is what Michael Feathers calls *seam* in Working Effectively with Legacy Code. We can use this seam to insert a Test Double to write tests for the logging behavior.
 
 It might be tempting to log the event in the ViewModel `init` method, but keep in mind that there is no guarantee that the app will initialize a ViewModel instance and render the view using it in direct sequence.\
 In fact, if you add a breakpoint or a `print` statement in `MenuItemDetail.ViewModel`‘s `init` method then run the app, you’ll notice that as soon as the menu list loads on the screen, all the ViewModels for each of the visible items initialize.\
@@ -128,6 +128,7 @@ func onAppear() {
 We *could* do a bit of refactoring and move the implementation details of this event outside of the ViewModel, perhaps in an `EventLogging` protocol extension, but I don’t see much value in that at this point.\
 The Refactor step in the Red, Green, Refactor workflow is about asking the question, not necessarily making a refactor.\
 Just because there’s a refactor opportunity, it doesn’t mean you should pursue it.\
+<!-- VERIFY: refactor heuristic post URL -->
 *Check out this post for a heuristic to help you decided when a refactor is appropriate.*
 
 The approach to implementing logging the event for when the user adds the item to the order is pretty much the same.\
