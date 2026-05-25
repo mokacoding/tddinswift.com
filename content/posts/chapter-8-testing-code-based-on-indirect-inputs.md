@@ -10,7 +10,6 @@ Chapter 8 introduced the concept of Test Doubles, test-specific equivalents of p
 ```swift
 // MenuFetchingStub.swift
 @testable import Albertos
-import Combine
 import Foundation
 
 class MenuFetchingStub: MenuFetching {
@@ -21,11 +20,8 @@ class MenuFetchingStub: MenuFetching {
         self.result = result
     }
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
-        return result.publisher
-            // Use a delay to simulate the real world async behavior
-            .delay(for: 0.1, scheduler: RunLoop.main)
-            .eraseToAnyPublisher()
+    func fetchMenu() async throws -> [MenuItem] {
+        try result.get()
     }
 }
 ```
@@ -78,23 +74,16 @@ init(
     self.menuFetching = menuFetching
     self.menuGrouping = menuGrouping
 
-    fetchMenu()
+    Task { await fetchMenu() }
 }
 
-private func fetchMenu() {
-    menuFetching
-        .fetchMenu()
-        .map(menuGrouping)
-        .sink(
-            receiveCompletion: { [weak self] completion in
-                guard case .failure(let error) = completion else { return }
-                self?.sections = .failure(error)
-            },
-            receiveValue: { [weak self] value in
-                self?.sections = .success(value)
-            }
-        )
-        .store(in: &cancellables)
+private func fetchMenu() async {
+    do {
+        let items = try await menuFetching.fetchMenu()
+        sections = .success(menuGrouping(items))
+    } catch {
+        sections = .failure(error)
+    }
 }
 ```
 
@@ -125,14 +114,11 @@ class MenuFetchingStub: MenuFetching {
         self.results = results
     }
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
+    func fetchMenu() async throws -> [MenuItem] {
         guard let result = results.first else { fatalError() }
         results = Array(results.dropFirst())
 
-        return result.publisher
-            // Use a delay to simulate the real world async behavior
-            .delay(for: 0.1, scheduler: RunLoop.main)
-            .eraseToAnyPublisher()
+        return try result.get()
     }
 }
 ```
@@ -151,56 +137,32 @@ Let’s get to it, then.
 ```swift
 // MenuList.ViewModelTests.swift
 // ...
-func testRetryMakesNewFetchRequest() {
+<!-- VERIFY: prefer Task.sleep or confirmation in async tests -->
+@Test func retryMakesNewFetchRequest() async throws {
     let menuFetchingStub = MenuFetchingStub(
         returning: [.failure(TestError(id: 123)), .failure(TestError(id: 234))]
     )
-
     let viewModel = MenuList.ViewModel(
         menuFetching: menuFetchingStub,
         menuGrouping: { _ in [] }
     )
 
-    let expectation = XCTestExpectation(description: "Publishes an error")
+    // First fetch (started in init)
+    try await Task.sleep(for: .milliseconds(150)) // allow the fetch to complete
+    guard case .failure(let firstError) = viewModel.sections else {
+        Issue.record("Expected a failing state, got \(viewModel.sections)")
+        return
+    }
+    #expect(firstError as? TestError == TestError(id: 123))
 
-    let cancellable = viewModel
-        .$sections
-        .dropFirst()
-        .sink { value in
-            guard case .failure(let error) = value else {
-                return XCTFail("Expected a failing Result, got: \(value)")
-            }
-
-            XCTAssertEqual(error as? TestError, TestError(id: 123))
-            expectation.fulfill()
-        }
-
-    wait(for: [expectation], timeout: 1)
-
-    // Cancel the previous subscription; otherwise, it will be called as well and fail the test
-    // because the error we should get on the retry is different from the first one.
-    cancellable.cancel()
-
-    let expectation2 = XCTestExpectation(description: "Retries and receives a different value")
-
-    viewModel
-        .$sections
-        // We `dropFirst()` here too, to discard the value stored in `sections`
-        // from the previous fetch.
-        .dropFirst()
-        .sink { value in
-            guard case .failure(let error) = value else {
-                return XCTFail("Expected a failing Result, got: \(value)")
-            }
-
-            XCTAssertEqual(error as? TestError, TestError(id: 234))
-            expectation2.fulfill()
-        }
-        .store(in: &cancellables)
-
+    // Retry
     viewModel.retry()
-
-    wait(for: [expectation2], timeout: 1)
+    try await Task.sleep(for: .milliseconds(150))
+    guard case .failure(let secondError) = viewModel.sections else {
+        Issue.record("Expected a failing state after retry, got \(viewModel.sections)")
+        return
+    }
+    #expect(secondError as? TestError == TestError(id: 234))
 }
 
 // MenuList.ViewModel.swift
@@ -226,7 +188,7 @@ Thanks to the refactor we did in Step 1, making the test pass requires nothing m
 
 ```swift
 func retry() {
-    fetchMenu()
+    Task { await fetchMenu() }
 }
 ```
 
@@ -274,34 +236,27 @@ We can simulate the error behavior by updating `MenuFetchingPlaceholder` to retu
 
 ```swift
 // MenuFetchingPlaceholder.swift
-import Combine
 import Foundation
 
 class MenuFetchingPlaceholder: MenuFetching {
 
     private var fetchCallCount = 0
 
-    func fetchMenu() -> AnyPublisher<[MenuItem], Error> {
-        let result: Result<[MenuItem], Error>
+    func fetchMenu() async throws -> [MenuItem] {
+        defer { fetchCallCount += 1 }
+
+        // Simulate async fetch
+        try await Task.sleep(for: .milliseconds(500))
+
         // Return an error on the first fetch
         if fetchCallCount == 0 {
-            result = .failure(
-                NSError(
-                    domain: "test",
-                    code: 1,
-                    userInfo: [NSLocalizedDescriptionKey: "Test error"]
-                )
+            throw NSError(
+                domain: "test",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Test error"]
             )
-        } else {
-            result = .success(menu)
         }
-
-        fetchCallCount += 1
-
-        return Future { $0(result) }
-            // Use a delay to simulate async fetch
-            .delay(for: 0.5, scheduler: RunLoop.main)
-            .eraseToAnyPublisher()
+        return menu
     }
 }
 ```
@@ -318,91 +273,39 @@ class MenuFetchingPlaceholder: MenuFetching {
 
 Here are two alternative implementations for the test just for fun – *this is bonus content, after all*.
 
-### Alternative 1: Cancel all `cancellables`
+### Alternative: Inspect via `confirmation`
 
-In the test for the retry behavior, we stored the `AnyCancellable` returned by the first `sink` call.\
-We need that first subscription to verify the retry behavior by asserting that the ViewModel publishes two different values, hence made two calls to `MenuFetching` and received two different responses, but we need to cancel it to avoid it being called when we retry.
+With Combine-based tests, this section used to discuss canceling old subscriptions or sharing a single `sink` across both expected emissions. Under `async`/`await`, those concerns largely disappear — we just read the state after each fetch completes.
 
-A different approach to canceling the subscription is to cancel *all* the subscriptions that the test stored.
-
-```swift
-// MenuList.ViewModelTests.swift
-// ...
-let expectation = XCTestExpectation(description: "Publishes an error")
-
-viewModel
-    .$sections
-    .dropFirst()
-    .sink { value in
-        guard case .failure(let error) = value else {
-            return XCTFail("Expected a failing Result, got: \(value)")
-        }
-
-        XCTAssertEqual(error as? TestError, TestError(id: 123))
-        expectation.fulfill()
-    }
-    .store(in: &cancellables)
-
-wait(for: [expectation], timeout: 1)
-
-cancellables.forEach { $0.cancel() }
-```
-
-It’s safe to cancel all of the other `cancellables` because tests run sequentially in the context of the same test class.\
-Even when running tests in parallel, Xcode will parallelize different test classes;\
-Xcode won’t distribute tests from the same class across different Simulators.\
-From the Xcode 10 release notes:
-
-> Test parallelization occurs by distributing the test classes in a target across\
-> multiple runner processes.
-
-Xcode 16 and Swift Testing extend this further: parallelization in Swift Testing is per-test by default, not per-class. The principle of safely cancelling unrelated subscriptions in a test still applies regardless of granularity.
-
-I somehow preferred storing the `AnyCancellable` value locally when writing the test, but I don’t have a strong rationale for choosing one option instead of the other.
-
-### Alternative 2: Use a single `sink`
-
-A different way to deal with multiple calls to the ViewModel triggering different subscriber closures is to *use a single subscriber*.\
-Remember the saying: the best way to solve a problem is not to have it.
+If the ViewModel still exposes a `$sections` publisher (because Ch 7 in v2 keeps `@Published`/`ObservableObject` per the TOC), we can lean on Swift Testing's `confirmation` to wait for the expected number of value emissions instead of sleeping:
 
 ```swift
-let expectation = XCTestExpectation(description: "Publishes an error")
-let expectation2 = XCTestExpectation(description: "Retries and gets a different value")
+@Test func retryEmitsTwoFailures() async throws {
+    let menuFetchingStub = MenuFetchingStub(
+        returning: [.failure(TestError(id: 123)), .failure(TestError(id: 234))]
+    )
+    let viewModel = MenuList.ViewModel(
+        menuFetching: menuFetchingStub,
+        menuGrouping: { _ in [] }
+    )
 
-var receivedErrors: [Error] = []
+    await confirmation("Emits two failures", expectedCount: 2) { confirm in
+        var cancellables: Set<AnyCancellable> = []
+        viewModel.$sections
+            .dropFirst()
+            .sink { value in
+                if case .failure = value { confirm() }
+            }
+            .store(in: &cancellables)
 
-viewModel
-    .$sections
-    .dropFirst()
-    .sink { value in
-        guard case .failure(let error) = value else {
-            return XCTFail("Expected a failing Result, got: \(value)")
-        }
-        guard receivedErrors.count < 2 else {
-            return XCTFail("Expected only two errors, got a third")
-        }
-
-        receivedErrors.append(error)
-
-        if receivedErrors.count == 1 { expectation.fulfill() }
-        if receivedErrors.count == 2 { expectation2.fulfill() }
+        try? await Task.sleep(for: .milliseconds(200))
+        viewModel.retry()
+        try? await Task.sleep(for: .milliseconds(200))
     }
-    .store(in: &cancellables)
-
-wait(for: [expectation], timeout: 1)
-
-viewModel.retry()
-
-wait(for: [expectation2], timeout: 1)
-
-// This check is a bit redundant, given the expectation fulfillment conditions above
-XCTAssertEqual(receivedErrors.count, 2)
-XCTAssertEqual(receivedErrors[safe: 0] as? TestError, TestError(id: 123))
-XCTAssertEqual(receivedErrors[safe: 1] as? TestError, TestError(id: 234))
+}
 ```
 
-This approach makes the test flow less linear because we need to manage both expectations in the same `sink` even though they refer to sequential calls separated by `retry()`.\
-On the other hand, the test is much more compact this way.
+The `confirmation` approach makes the test's intent clearer: we expect two failure emissions.
 
 All the alternatives produce the same result. Which option to choose is up to your taste; there’s no right or wrong answer.
 
