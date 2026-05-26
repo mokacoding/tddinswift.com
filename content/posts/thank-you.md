@@ -8,9 +8,8 @@ slug: thank-you
 <!-- VERIFY: bonus email automation still wired up after WP→GH Pages migration -->
 Thank you for purchasing and reading the book. You’ll receive an email shortly with a link to the bonus material.
 
-<!-- VERIFY: source.movhttps://... URL is malformed from the WP migration; consider moving the GIF in-tree (see TODO.md) -->
 <figure class="aligncenter size-large is-resized">
-<img src="https://web.archive.org/web/20230201180527im_/https://i0.wp.com/media.giphy.com/media/M9NbzZjAcxq9jS9LZJ/source.movhttps://media.giphy.com/media/M9NbzZjAcxq9jS9LZJ/giphy.gif?resize=353%2C294&amp;ssl=1" width="353" height="294" />
+<img src="/images/thank-you.gif" width="353" height="294" alt="Animated thank-you GIF" />
 </figure>
 
 In the meantime, it would mean the world to me if you could leave a review on Amazon as this goes a long way to help others discover the book.
