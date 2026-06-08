@@ -46,14 +46,14 @@ class NetworkFetchingSpy: NetworkFetching {
 }
 ```
 
-The Spy implementation is similar to the Stub from Chapter 10. Like the Stub, it, too, simulates the real network request by leveraging `Result`‘s capability to generate a `Publisher` and add a delay to introduce an async component in the code execution.
+The Spy implementation is similar to the Stub from Chapter 10. Like the Stub, its `load(_:)` is `async throws`, which gives the test a natural `await` point; here it records the request, then throws to short-circuit the call.
 
 In the `load(_:)` implementation, the Spy stores the `URLRequest` input parameter in a `private(set)` variable so that consumers can read it but not accidentally modify it.
 
 Unlike the Stub, though, the Spy doesn’t allow configuring the `load(_:)` return value but has a hardcoded return value. In this implementation I chose to return an error, but you could as well return a successful value by making `MenuItem` conform to `Encodable` and using:
 
 ```swift
-.success(try! JSONEncoder().encode([MenuItem.fixture()]))
+return try! JSONEncoder().encode([MenuItem.fixture()])
 ```
 
 It doesn’t matter what the Spy returns because the test won’t be looking at it; they’ll only use the probes the Spy offers to measure the SUT side-effects.
