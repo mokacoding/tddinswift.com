@@ -3,24 +3,15 @@
 Running list of things that need follow-up.
 Agents: read this at the start of a session and append new tasks here rather than burying them in chat.
 
-## Recover the Albertos demo gifs from wp.com
+## Verify the SendFox bonus drip
 
-Two blog posts reference animated gifs that the wayback crawler never captured:
+The `/gift/` signup form (`content/posts/gift.md`) posts to SendFox form `3exkvl`.
+Confirm in the SendFox dashboard that an automation/sequence is wired to that form,
+so subscribers actually receive the "daily drip" of bonus content the page promises.
+The `/thank-you/` page's "bonus email" relies on the same sequence.
 
-- `albertos-loading-demo.gif` — embedded in `content/posts/how-to-model-the-loading-state-with-remotedata.md` and in the `content/posts/albertos-loading-demo.md` attachment page.
-- `albertos-retry-demo.gif` — embedded in `content/posts/chapter-8-testing-code-based-on-indirect-inputs.md` and in the `content/posts/albertos-retry-demo.md` attachment page.
-
-Both figures are currently commented out (search the repo for `TODO(TODO.md): restore`).
-
-Original WordPress upload paths:
-
-- `https://tddinswift.com/wp-content/uploads/2021/07/albertos-loading-demo.gif`
-- `https://tddinswift.com/wp-content/uploads/2021/07/albertos-retry-demo.gif`
-
-Action: log in to the old `tddinswift.com` WordPress admin on wordpress.com, open the Media Library, and download both gifs.
-Once recovered, drop them under `static/images/` (or equivalent), rewrite the four `<figure>` blocks above as clean markdown image syntax pointing at the local paths, and delete the TODO comments.
-
-If the gifs are no longer in the WordPress Media Library either, check Time Machine backups and the iOS simulator recordings folder before giving up and re-recording them from the `test-driven-development-in-swift/13-testing-view-presentation/1-end/Albertos` example project.
+Action: run `hugo server -D`, submit a test signup on `/gift/`, and confirm the
+subscriber lands in SendFox and the first drip email fires.
 
 ## Design a proper Open Graph share card
 
