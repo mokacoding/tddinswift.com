@@ -150,8 +150,8 @@ To make the test pass, we need to set `sections = .loading` before starting the 
 // Set the state to `.loading` before starting a fetch
 sections = .loading
 
-menuFetching.fetchMenu()
-    // ...
+let items = try await menuFetching.fetchMenu()
+// ...
 ```
 
 This change alone is enough to make the test pass, but I would recommend also updating the default value set for `sections`:
