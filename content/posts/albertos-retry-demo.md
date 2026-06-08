@@ -6,13 +6,7 @@ slug: albertos-retry-demo
 draft: true
 ---
 
-<!-- TODO(TODO.md): restore `albertos-retry-demo.gif` — asset wasn't captured on wayback.
-[Previous Image](/ledger_1f4d2/)
-
-[Next Image](/albertos-loading-demo/)
-
-<figure class="entry-attachment wp-block-image">
-<img src="https://web.archive.org/web/20230201195903im_/https://i0.wp.com/tddinswift.com/wp-content/uploads/2021/07/albertos-retry-demo.gif?fit=600%2C1311&amp;ssl=1" class="attachment-full size-full jetpack-lazy-image" width="600" height="1311" />
+<figure class="text-center my-8">
+  <img src="/images/albertos-retry-demo.gif" alt="The retry flow: an error state, tapping Retry, then the loaded menu" class="mx-auto rounded-md w-64" />
 </figure>
--->
 

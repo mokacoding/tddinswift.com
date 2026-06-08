@@ -6,11 +6,7 @@ slug: albertos-loading-demo
 draft: true
 ---
 
-<!-- TODO(TODO.md): restore `albertos-loading-demo.gif` — asset wasn't captured on wayback.
-[Previous Image](/albertos-retry-demo/)
-
-<figure class="entry-attachment wp-block-image">
-<img src="https://web.archive.org/web/20230201183501im_/https://i0.wp.com/tddinswift.com/wp-content/uploads/2021/07/albertos-loading-demo.gif?fit=772%2C1688&amp;ssl=1" class="attachment-full size-full jetpack-lazy-image" width="772" height="1688" />
+<figure class="text-center my-8">
+  <img src="/images/albertos-loading-demo.gif" alt="The app launching, showing a loading state, then the loaded menu" class="mx-auto rounded-md w-64" />
 </figure>
--->
 
