@@ -22,6 +22,16 @@ Once recovered, drop them under `static/images/` (or equivalent), rewrite the fo
 
 If the gifs are no longer in the WordPress Media Library either, check Time Machine backups and the iOS simulator recordings folder before giving up and re-recording them from the `test-driven-development-in-swift/13-testing-view-presentation/1-end/Albertos` example project.
 
+## Design a proper Open Graph share card
+
+`og:image` currently points at the portrait book cover (`static/images/cover.png`),
+which letterboxes on landscape social cards.
+A purpose-built 1200×630 card would preview better on X, LinkedIn, Slack, etc.
+
+See [`docs/og-image.md`](docs/og-image.md) for the spec, the free-tier Canva path
+(and its gotchas), and the design guidance.
+Not a launch blocker — the cover works as a stopgap.
+
 ## Replace the Tailwind play CDN with a real build pipeline
 
 Tailwind is currently loaded at runtime from `cdn.tailwindcss.com?plugins=typography`,
