@@ -1,7 +1,7 @@
 # Open Graph share card
 
 How the site's social-share preview image (the "OG image") is wired, and how to
-replace the current stopgap with a proper landscape card.
+swap in a different one.
 
 ## What this is
 
@@ -10,7 +10,7 @@ X, LinkedIn, Slack, Facebook, or iMessage.
 It is set once, in `themes/blank-canvas/layouts/partials/head.html`:
 
 ```html
-<meta property="og:image" content="https://tddinswift.com/images/cover.png" />
+<meta property="og:image" content="https://tddinswift.com/images/og-card.png" />
 ```
 
 Two non-obvious requirements:
@@ -21,17 +21,16 @@ Two non-obvious requirements:
 - The canonical card size is **1200 × 630 px**, landscape (the
   `summary_large_image` / 1.91:1 standard).
 
-## Current state (stopgap)
+## Current state
 
-`og:image` points at the **book cover**, `static/images/cover.png` (827 × 1254,
-portrait).
-The cover works as a preview and matches what the 1st-edition site did, but it is
-portrait, so landscape cards letterbox or center-crop it.
+`og:image` points at `static/images/og-card.png` — the official Apress/Springer
+promo card (1200 × 628, landscape): book cover, title, author, and publisher
+branding. No letterboxing.
 
-Good enough to launch with. The note below is for upgrading it to a purpose-built
-landscape card when there's time.
+The Canva guidance below is kept in case you ever want a custom card matching the
+site's own dark/cyan/gold identity instead of the publisher template.
 
-## Target: a proper 1200 × 630 card
+## Swapping in a different card
 
 Design a landscape card featuring the cover thumbnail + the title + a short
 tagline, then:

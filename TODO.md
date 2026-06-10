@@ -13,16 +13,6 @@ The `/thank-you/` page's "bonus email" relies on the same sequence.
 Action: run `hugo server -D`, submit a test signup on `/gift/`, and confirm the
 subscriber lands in SendFox and the first drip email fires.
 
-## Design a proper Open Graph share card
-
-`og:image` currently points at the portrait book cover (`static/images/cover.png`),
-which letterboxes on landscape social cards.
-A purpose-built 1200×630 card would preview better on X, LinkedIn, Slack, etc.
-
-See [`docs/og-image.md`](docs/og-image.md) for the spec, the free-tier Canva path
-(and its gotchas), and the design guidance.
-Not a launch blocker — the cover works as a stopgap.
-
 ## Replace the Tailwind play CDN with a real build pipeline
 
 Tailwind is currently loaded at runtime from `cdn.tailwindcss.com?plugins=typography`,
