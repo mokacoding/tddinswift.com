@@ -14,11 +14,6 @@
                     prose-li:text-foreground-muted marker:text-primary">
       <header class="mb-10 not-prose">
         <h1 class="font-display text-4xl md:text-5xl text-primary mb-3">{{ .Title }}</h1>
-        {{ with .Date }}
-          {{ $machine := . | time.Format "2006-01-02" }}
-          {{ $human := . | time.Format "January 2, 2006" }}
-          <time datetime="{{ $machine }}" class="text-sm text-foreground-muted">{{ $human }}</time>
-        {{ end }}
       </header>
       {{ .Content }}
     </article>
